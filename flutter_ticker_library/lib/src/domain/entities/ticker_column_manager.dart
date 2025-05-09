@@ -14,13 +14,13 @@ import 'ticker_draw_metrics.dart';
 class TickerColumnManager {
   /// The list of ticker columns being managed
   final List<TickerColumn> tickerColumns = [];
-  
+
   /// The metrics used for drawing characters
   final TickerDrawMetrics _metrics;
 
   /// The character lists used for animations
   List<TickerCharacterList>? _characterLists;
-  
+
   /// The set of characters supported by the character lists
   Set<String>? _supportedCharacters;
 
@@ -29,7 +29,8 @@ class TickerColumnManager {
 
   /// Sets the character lists to use for animations
   void setCharacterLists(List<String> characterLists) {
-    _characterLists = characterLists.map((list) => TickerCharacterList(list)).toList();
+    _characterLists =
+        characterLists.map((list) => TickerCharacterList(list)).toList();
 
     _supportedCharacters = <String>{};
     for (var list in _characterLists!) {
@@ -50,7 +51,7 @@ class TickerColumnManager {
   /// Tell the column manager the new target text that it should display.
   void setText(String text) {
     if (_characterLists == null) {
-      throw StateError("Need to call #setCharacterLists first.");
+      throw StateError('Need to call #setCharacterLists first.');
     }
 
     // First remove any zero-width columns
@@ -63,32 +64,32 @@ class TickerColumnManager {
     // Use Levenshtein distance algorithm to figure out how to manipulate the columns
     final List<int> actions = LevenshteinUtils.computeColumnActions(
         currentTextChars, newTextChars, _supportedCharacters!);
-        
+
     int columnIndex = 0;
     int textIndex = 0;
-    
+
     for (int i = 0; i < actions.length; i++) {
       switch (actions[i]) {
-        case LevenshteinUtils.ACTION_INSERT:
+        case LevenshteinUtils.actionInsert:
           tickerColumns.insert(
               columnIndex, TickerColumn(_characterLists!, _metrics));
           // Intentional fallthrough
           continue actionSame;
           
         actionSame:
-        case LevenshteinUtils.ACTION_SAME:
+        case LevenshteinUtils.actionSame:
           tickerColumns[columnIndex].setTargetChar(newTextChars[textIndex]);
           columnIndex++;
           textIndex++;
           break;
           
-        case LevenshteinUtils.ACTION_DELETE:
-          tickerColumns[columnIndex].setTargetChar(TickerUtils.EMPTY_CHAR);
+        case LevenshteinUtils.actionDelete:
+          tickerColumns[columnIndex].setTargetChar(TickerUtils.emptyChar);
           columnIndex++;
           break;
-          
+
         default:
-          throw ArgumentError("Unknown action: ${actions[i]}");
+          throw ArgumentError('Unknown action: ${actions[i]}');
       }
     }
   }
@@ -130,15 +131,15 @@ class TickerColumnManager {
     final StringBuffer currentText = StringBuffer();
     for (var column in tickerColumns) {
       final char = column.getCurrentChar();
-      if (char != TickerUtils.EMPTY_CHAR) {
+      if (char != TickerUtils.emptyChar) {
         currentText.write(char);
       }
     }
     return currentText.toString();
   }
 
-  /// This method will draw onto the canvas the appropriate UI state of each column dictated
-  /// by [animationProgress]. As a side effect, this method will also translate the canvas
+  /// This method will draw onto the canvas the appropriate UI state of each column.
+  /// As a side effect, this method will also translate the canvas
   /// accordingly for the draw procedures.
   void draw(Canvas canvas, TextPainter textPainter) {
     for (var column in tickerColumns) {

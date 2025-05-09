@@ -15,10 +15,10 @@ class TickerColumn {
   final TickerDrawMetrics _metrics;
 
   /// The current character being displayed
-  String _currentChar = TickerUtils.EMPTY_CHAR;
+  String _currentChar = TickerUtils.emptyChar;
 
   /// The target character to animate to
-  String _targetChar = TickerUtils.EMPTY_CHAR;
+  String _targetChar = TickerUtils.emptyChar;
 
   /// The current character list being used for animation
   List<String>? _currentCharacterList;
@@ -123,7 +123,7 @@ class TickerColumn {
     // the current and target characters. We should warn the developer that they need to
     // add more character lists to support the transitions they want.
     throw ArgumentError(
-        'Couldn\'t find a character list containing both ${'$_currentChar'} and ${'$_targetChar'}');
+        'Couldn\'t find a character list containing both $_currentChar and $_targetChar');
   }
 
   /// Called when the animation ends
@@ -134,7 +134,7 @@ class TickerColumn {
 
   /// Checks if the draw metrics have changed and updates widths accordingly
   void _checkForDrawMetricsChanges() {
-    if (_currentWidth <= 0 && _currentChar != TickerUtils.EMPTY_CHAR) {
+    if (_currentWidth <= 0 && _currentChar != TickerUtils.emptyChar) {
       _currentWidth = _metrics.getCharWidth(_currentChar);
     }
     if (_minimumRequiredWidth <= 0) {
@@ -149,7 +149,8 @@ class TickerColumn {
 
     // Compute what position the characters should be in based on the progress
     // of the animation.
-    final double startToEndDistance = (_endIndex - _startIndex).abs().toDouble();
+    final double startToEndDistance =
+        (_endIndex - _startIndex).abs().toDouble();
     final double bottomCharPosition = startToEndDistance * animationProgress;
 
     // The bottom character is the character that we're animating away from, which is
@@ -176,7 +177,7 @@ class TickerColumn {
     // character in the column relative to the baseline.
     _bottomDelta =
         bottomCharOffsetPercentage * charHeight * _directionAdjustment +
-        additionalDelta;
+            additionalDelta;
 
     // Figure out what the actual character index is in the characterList, and then
     // draw the character with the computed offset.

@@ -3,6 +3,8 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:ticker/ticker.dart';
 
+import 'interactive_demo.dart';
+
 void main() {
   runApp(const MyApp());
 }
@@ -74,6 +76,17 @@ class _MainScreenState extends State<MainScreen> {
               },
               child: const Text('Slide Direction Demo'),
             ),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const InteractiveDemoScreen()),
+                );
+              },
+              child: const Text('Interactive Demo'),
+            ),
           ],
         ),
       ),
@@ -90,12 +103,15 @@ abstract class BaseDemoScreenState<T extends BaseDemoScreen> extends State<T> {
   static final Random random = Random();
   Timer? _timer;
   bool _isActive = true;
+  bool _isContinuousMode = true; // Flag to control continuous vs manual mode
 
   @override
   void initState() {
     super.initState();
     _isActive = true;
-    _scheduleUpdate();
+    if (_isContinuousMode) {
+      _scheduleUpdate();
+    }
   }
 
   @override
@@ -107,11 +123,30 @@ abstract class BaseDemoScreenState<T extends BaseDemoScreen> extends State<T> {
 
   void _scheduleUpdate() {
     _timer = Timer(Duration(milliseconds: random.nextInt(1750) + 250), () {
-      if (_isActive) {
+      if (_isActive && _isContinuousMode) {
         onUpdate();
         _scheduleUpdate();
       }
     });
+  }
+  
+  // Toggle between continuous and manual modes
+  void toggleUpdateMode() {
+    setState(() {
+      _isContinuousMode = !_isContinuousMode;
+      if (_isContinuousMode) {
+        _scheduleUpdate();
+      } else {
+        _timer?.cancel();
+      }
+    });
+  }
+  
+  // Manually trigger an update (for manual mode)
+  void manualUpdate() {
+    if (!_isContinuousMode) {
+      onUpdate();
+    }
   }
 
   // To be implemented by subclasses
@@ -144,7 +179,7 @@ class BasicDemoScreen extends BaseDemoScreen {
 }
 
 class _BasicDemoScreenState extends BaseDemoScreenState<BasicDemoScreen> {
-  final String alphabetList = "abcdefghijklmnopqrstuvwxyz";
+  final String alphabetList = 'abcdefghijklmnopqrstuvwxyz';
 
   final GlobalKey<TickerWidgetState> _ticker1Key = GlobalKey();
   final GlobalKey<TickerWidgetState> _ticker2Key = GlobalKey();
@@ -156,102 +191,138 @@ class _BasicDemoScreenState extends BaseDemoScreenState<BasicDemoScreen> {
       appBar: AppBar(
         title: const Text('Basic Demo'),
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        actions: [
+          // Add a toggle button for update mode
+          IconButton(
+            icon: Icon(_isContinuousMode ? Icons.loop : Icons.touch_app),
+            onPressed: toggleUpdateMode,
+            tooltip: _isContinuousMode ? 'Switch to Manual Mode' : 'Switch to Continuous Mode',
+          ),
+        ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            // Ticker with downward scrolling
-            Card(
-              child: Padding(
+      body: SingleChildScrollView(
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // Mode indicator
+              Padding(
                 padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  children: [
-                    Text(
-                      'Downward Scrolling',
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
-                    const SizedBox(height: 8),
-                    TickerWidget(
-                      key: _ticker1Key,
-                      text: "12345678",
-                      textSize: 30,
-                      textColor: Colors.blue,
-                      characterLists: [TickerUtils.provideNumberList()],
-                      preferredScrollingDirection: ScrollingDirection.down,
-                    ),
-                  ],
+                child: Text(
+                  'Mode: ${_isContinuousMode ? "Continuous (Auto)" : "Manual (Tap to Update)"}',
+                  style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: _isContinuousMode ? Colors.blue : Colors.green,
+                  ),
                 ),
               ),
-            ),
-
-            const SizedBox(height: 16),
-
-            // Ticker with upward scrolling and currency
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  children: [
-                    Text(
-                      'Upward Scrolling (Currency)',
-                      style: Theme.of(context).textTheme.titleMedium,
+              
+              // Manual update button (only visible in manual mode)
+              if (!_isContinuousMode)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 16.0),
+                  child: ElevatedButton.icon(
+                    onPressed: manualUpdate,
+                    icon: const Icon(Icons.refresh),
+                    label: const Text('Update Values'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.green,
+                      foregroundColor: Colors.white,
                     ),
-                    const SizedBox(height: 8),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Text(
-                          '\$',
-                          style: TextStyle(
-                            fontSize: 30,
-                            fontWeight: FontWeight.bold,
+                  ),
+                ),
+                
+              // Ticker with downward scrolling
+              Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    children: [
+                      Text(
+                        'Up Direction Scrolling (Numbers)',
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
+                      const SizedBox(height: 8),
+                      TickerWidget(
+                        key: _ticker1Key,
+                        text: '12345678',
+                        textSize: 30,
+                        textColor: Colors.blue,
+                        characterLists: [TickerUtils.provideNumberList()],
+                        preferredScrollingDirection: ScrollingDirection.up,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 16),
+
+              // Ticker with downward scrolling and currency
+              Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    children: [
+                      Text(
+                        'Down Direction Scrolling (Currency)',
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
+                      const SizedBox(height: 8),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Text(
+                            '\$',
+                            style: TextStyle(
+                              fontSize: 30,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
-                        ),
-                        TickerWidget(
-                          key: _ticker2Key,
-                          text: "0.00",
-                          textSize: 30,
-                          textColor: Colors.green,
-                          characterLists: [
-                            TickerUtils.provideNumberList() + "."
-                          ],
-                          preferredScrollingDirection: ScrollingDirection.up,
-                        ),
-                      ],
-                    ),
-                  ],
+                          TickerWidget(
+                            key: _ticker2Key,
+                            text: '0.00',
+                            textSize: 30,
+                            textColor: Colors.green,
+                            characterLists: [
+                              '${TickerUtils.provideNumberList()}.'
+                            ],
+                            preferredScrollingDirection: ScrollingDirection.down,
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
 
-            const SizedBox(height: 16),
+              const SizedBox(height: 16),
 
-            // Ticker with any direction scrolling (alphabets)
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  children: [
-                    Text(
-                      'Any Direction Scrolling (Alphabets)',
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
-                    const SizedBox(height: 8),
-                    TickerWidget(
-                      key: _ticker3Key,
-                      text: "flutter",
-                      textSize: 30,
-                      textColor: Colors.orange,
-                      characterLists: [TickerUtils.provideAlphabeticalList()],
-                      preferredScrollingDirection: ScrollingDirection.any,
-                    ),
-                  ],
+              // Ticker with any direction scrolling (alphabets)
+              Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    children: [
+                      Text(
+                        'Any Direction Scrolling (Alphabets)',
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
+                      const SizedBox(height: 8),
+                      TickerWidget(
+                        key: _ticker3Key,
+                        text: 'flutter',
+                        textSize: 30,
+                        textColor: Colors.orange,
+                        characterLists: [TickerUtils.provideAlphabeticalList()],
+                        preferredScrollingDirection: ScrollingDirection.any,
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -266,8 +337,7 @@ class _BasicDemoScreenState extends BaseDemoScreenState<BasicDemoScreen> {
       _ticker1Key.currentState?.setText(getRandomNumber(digits));
 
       // Update the currency ticker
-      final currencyFloat =
-          (BaseDemoScreenState.random.nextDouble() * 100).toString();
+      final currencyFloat = (BaseDemoScreenState.random.nextDouble() * 100).toString();
       _ticker2Key.currentState?.setText(
           currencyFloat.substring(0, min(digits, currencyFloat.length)));
 
@@ -305,33 +375,59 @@ class _PerformanceDemoScreenState
       appBar: AppBar(
         title: const Text('Performance Demo'),
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        actions: [
+          // Add a toggle button for update mode
+          IconButton(
+            icon: Icon(_isContinuousMode ? Icons.loop : Icons.touch_app),
+            onPressed: toggleUpdateMode,
+            tooltip: _isContinuousMode ? 'Switch to Manual Mode' : 'Switch to Continuous Mode',
+          ),
+          // Add manual update button when in manual mode
+          if (!_isContinuousMode)
+            IconButton(
+              icon: const Icon(Icons.refresh),
+              onPressed: manualUpdate,
+              tooltip: 'Manually Update Tickers',
+            ),
+        ],
       ),
-      body: ListView.builder(
-        itemCount: 20,
-        itemBuilder: (context, index) {
-          return Card(
-            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Row(
-                children: [
-                  Text('Row ${index + 1}: ',
-                      style: const TextStyle(fontWeight: FontWeight.bold)),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: TickerWidget(
-                      key: _tickerKeys[index],
-                      text: getRandomNumber(8),
-                      textSize: 24,
-                      textColor: Colors.indigo,
-                      characterLists: [TickerUtils.provideNumberList()],
-                    ),
-                  ),
-                ],
+      body: Column(
+        children: [
+          // Mode indicator
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Text(
+              'Mode: ${_isContinuousMode ? 'Continuous (Auto)' : 'Manual (Tap to Update)'}',
+              style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                fontWeight: FontWeight.bold,
+                color: _isContinuousMode ? Colors.blue : Colors.green,
               ),
             ),
-          );
-        },
+          ),
+          // List of tickers
+          Expanded(
+            child: ListView.builder(
+              itemCount: _tickerKeys.length,
+              itemBuilder: (context, index) {
+                return Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 16.0),
+                  child: Card(
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: TickerWidget(
+                        key: _tickerKeys[index],
+                        text: getRandomNumber(8),
+                        textSize: 24,
+                        textColor: Colors.indigo,
+                        characterLists: [TickerUtils.provideNumberList()],
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -360,7 +456,7 @@ class _SlideDirectionDemoScreenState
     extends BaseDemoScreenState<SlideDirectionDemoScreen> {
   final GlobalKey<TickerWidgetState> _tickerKey = GlobalKey();
   ScrollingDirection _currentDirection = ScrollingDirection.any;
-  String _currentText = "12345";
+  String _currentText = '12345';
 
   @override
   Widget build(BuildContext context) {
@@ -436,6 +532,8 @@ class _SlideDirectionDemoScreenState
         return 'Down';
       case ScrollingDirection.any:
         return 'Any (Shortest Path)';
+      default:
+        return ''; // This line is added to satisfy the Dart analyzer
     }
   }
 

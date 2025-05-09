@@ -6,7 +6,7 @@ import '../../../src/domain/entities/ticker_draw_metrics.dart';
 
 /// The primary widget for showing a ticker text view that handles smoothly scrolling from the
 /// current text to a given text. The scrolling behavior is defined by
-/// [setCharacterLists] which dictates what characters come in between the starting
+/// the character lists which dictate what characters come in between the starting
 /// and ending characters.
 ///
 /// This class primarily handles the drawing customization of the ticker view, for example
@@ -55,7 +55,7 @@ class TickerWidget extends StatefulWidget {
 
   /// Creates a new ticker widget
   const TickerWidget({
-    Key? key,
+    super.key,
     this.text,
     this.textColor = Colors.black,
     this.textSize = 12.0,
@@ -69,7 +69,7 @@ class TickerWidget extends StatefulWidget {
     this.characterLists,
     this.letterSpacing = 1.0,
     this.padding = const EdgeInsets.all(2.0),
-  }) : super(key: key);
+  });
 
   @override
   State<TickerWidget> createState() => TickerWidgetState();
@@ -174,8 +174,8 @@ class TickerWidgetState extends State<TickerWidget>
     // Update scrolling direction if it changed
     if (widget.preferredScrollingDirection !=
         oldWidget.preferredScrollingDirection) {
-      _metrics.setPreferredScrollingDirection(
-          widget.preferredScrollingDirection);
+      _metrics
+          .setPreferredScrollingDirection(widget.preferredScrollingDirection);
     }
 
     // Update character lists if they changed
@@ -318,9 +318,8 @@ class TickerWidgetState extends State<TickerWidget>
 
     // Add letter spacing between characters
     final int numColumns = _columnManager.tickerColumns.length;
-    final double letterSpacingWidth = numColumns > 0
-        ? (numColumns - 1) * widget.letterSpacing
-        : 0;
+    final double letterSpacingWidth =
+        numColumns > 0 ? (numColumns - 1) * widget.letterSpacing : 0;
 
     return baseWidth + letterSpacingWidth + widget.padding.horizontal;
   }
@@ -372,8 +371,7 @@ class _TickerPainter extends CustomPainter {
     canvas.save();
 
     // Align the canvas based on gravity
-    final currentWidth =
-        columnManager.getCurrentWidth() +
+    final currentWidth = columnManager.getCurrentWidth() +
         (letterSpacing * (columnManager.tickerColumns.length - 1));
     final currentHeight = metrics.getCharHeight();
 
@@ -417,7 +415,7 @@ class _TickerPainter extends CustomPainter {
       final currentChar = column.getCurrentChar();
 
       // Skip empty characters
-      if (currentChar == TickerUtils.EMPTY_CHAR) {
+      if (currentChar == TickerUtils.emptyChar) {
         continue;
       }
 
@@ -428,7 +426,7 @@ class _TickerPainter extends CustomPainter {
       canvas.restore();
 
       // Get the next character for spacing calculation
-      String nextChar = TickerUtils.EMPTY_CHAR;
+      String nextChar = TickerUtils.emptyChar;
       if (i < columnManager.tickerColumns.length - 1) {
         nextChar = columnManager.tickerColumns[i + 1].getCurrentChar();
       }
@@ -438,7 +436,7 @@ class _TickerPainter extends CustomPainter {
 
       // Calculate ideal spacing between current and next character
       // using our enhanced metrics calculator
-      double idealSpacing = metrics.getIdealSpacingBetween(
+      final double idealSpacing = metrics.getIdealSpacingBetween(
         currentChar,
         nextChar,
         letterSpacing,

@@ -35,9 +35,9 @@ class TickerCharacterList {
     characterIndicesMap = {},
     characterList = [] {
       
-    if (characters.contains(TickerUtils.EMPTY_CHAR)) {
+    if (characters.contains(TickerUtils.emptyChar)) {
       throw ArgumentError(
-        'You cannot include TickerUtils.EMPTY_CHAR in the character list.');
+        'You cannot include TickerUtils.emptyChar in the character list.');
     }
 
     final List<String> charsList = characters.split('');
@@ -48,7 +48,7 @@ class TickerCharacterList {
     }
 
     // Initialize with empty char
-    characterList.add(TickerUtils.EMPTY_CHAR);
+    characterList.add(TickerUtils.emptyChar);
     
     // Add the character list twice to handle wrap-around animations
     characterList.addAll(charsList);
@@ -78,7 +78,7 @@ class TickerCharacterList {
 
     switch (direction) {
       case ScrollingDirection.down:
-        if (end == TickerUtils.EMPTY_CHAR) {
+        if (end == TickerUtils.emptyChar) {
           endIndex = characterList.length;
         } else if (endIndex < startIndex) {
           endIndex += numOriginalCharacters;
@@ -93,7 +93,7 @@ class TickerCharacterList {
         
       case ScrollingDirection.any:
         // see if the wrap-around animation is shorter distance than the original animation
-        if (start != TickerUtils.EMPTY_CHAR && end != TickerUtils.EMPTY_CHAR) {
+        if (start != TickerUtils.emptyChar && end != TickerUtils.emptyChar) {
           if (endIndex < startIndex) {
             // If we are potentially going backwards
             final int nonWrapDistance = startIndex - endIndex;
@@ -118,7 +118,7 @@ class TickerCharacterList {
 
   /// Gets the index of a character in the character list
   int _getIndexOfChar(String c) {
-    if (c == TickerUtils.EMPTY_CHAR) {
+    if (c == TickerUtils.emptyChar) {
       return 0;
     } else if (characterIndicesMap.containsKey(c)) {
       return characterIndicesMap[c]! + 1;

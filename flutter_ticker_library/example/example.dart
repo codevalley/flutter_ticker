@@ -32,25 +32,25 @@ class _MyHomePageState extends State<MyHomePage> {
   final GlobalKey<TickerWidgetState> _numberTickerKey = GlobalKey();
   final GlobalKey<TickerWidgetState> _priceTickerKey = GlobalKey();
   final GlobalKey<TickerWidgetState> _textTickerKey = GlobalKey();
-  
+
   int _counter = 0;
 
   void _incrementCounter() {
     setState(() {
       _counter++;
-      
+
       // Update number ticker
       _numberTickerKey.currentState?.setText(_counter.toString());
-      
+
       // Update price ticker
       final price = (_counter * 1.25).toStringAsFixed(2);
       _priceTickerKey.currentState?.setText(price);
-      
+
       // Update text ticker with alternating text
       if (_counter % 2 == 0) {
-        _textTickerKey.currentState?.setText("FLUTTER");
+        _textTickerKey.currentState?.setText('FLUTTER');
       } else {
-        _textTickerKey.currentState?.setText("TICKER");
+        _textTickerKey.currentState?.setText('TICKER');
       }
     });
   }
@@ -80,7 +80,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     const SizedBox(height: 8),
                     TickerWidget(
                       key: _numberTickerKey,
-                      text: "0",
+                      text: '0',
                       textSize: 30,
                       textColor: Colors.blue,
                       characterLists: [TickerUtils.provideNumberList()],
@@ -90,7 +90,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
               ),
             ),
-            
+
             // Price ticker
             Card(
               margin: const EdgeInsets.all(16),
@@ -115,10 +115,12 @@ class _MyHomePageState extends State<MyHomePage> {
                         ),
                         TickerWidget(
                           key: _priceTickerKey,
-                          text: "0.00",
+                          text: '0.00',
                           textSize: 30,
                           textColor: Colors.green,
-                          characterLists: [TickerUtils.provideNumberList() + "."],
+                          characterLists: [
+                            '${TickerUtils.provideNumberList()}.'
+                          ],
                           preferredScrollingDirection: ScrollingDirection.down,
                         ),
                       ],
@@ -127,7 +129,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
               ),
             ),
-            
+
             // Text ticker
             Card(
               margin: const EdgeInsets.all(16),
@@ -142,7 +144,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     const SizedBox(height: 8),
                     TickerWidget(
                       key: _textTickerKey,
-                      text: "FLUTTER",
+                      text: 'FLUTTER',
                       textSize: 30,
                       textColor: Colors.orange,
                       characterLists: [TickerUtils.provideAlphabeticalList()],
