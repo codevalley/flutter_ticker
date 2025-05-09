@@ -37,10 +37,12 @@ class LevenshteinUtils {
       if (reachedEndOfSource && reachedEndOfTarget) {
         break;
       } else if (reachedEndOfSource) {
-        _fillWithActions(columnActions, target.length - targetIndex, actionInsert);
+        _fillWithActions(
+            columnActions, target.length - targetIndex, actionInsert);
         break;
       } else if (reachedEndOfTarget) {
-        _fillWithActions(columnActions, source.length - sourceIndex, actionDelete);
+        _fillWithActions(
+            columnActions, source.length - sourceIndex, actionDelete);
         break;
       }
 

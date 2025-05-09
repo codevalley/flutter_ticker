@@ -137,13 +137,13 @@ class TickerWidgetState extends State<TickerWidget>
   void didUpdateWidget(TickerWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    // Update animation duration if it changed
+    // Update animation properties if they changed
     if (widget.animationDuration != oldWidget.animationDuration) {
-      _animationController.duration =
-          Duration(milliseconds: widget.animationDuration);
+      _animationController.duration = Duration(
+        milliseconds: widget.animationDuration,
+      );
     }
 
-    // Update animation curve if it changed
     if (widget.animationCurve != oldWidget.animationCurve) {
       _animation = CurvedAnimation(
         parent: _animationController,
@@ -158,36 +158,36 @@ class TickerWidgetState extends State<TickerWidget>
         widget.textStyle != oldWidget.textStyle) {
       _textPainter.text = TextSpan(text: '', style: _getTextStyle());
       _metrics = TickerDrawMetrics(textStyle: _getTextStyle());
+      _metrics.setPreferredScrollingDirection(
+        widget.preferredScrollingDirection,
+      );
       _columnManager = TickerColumnManager(_metrics);
 
-      // Reinitialize character lists and text
       if (widget.characterLists != null) {
         _columnManager.setCharacterLists(widget.characterLists!);
-        if (_currentText.isNotEmpty) {
-          _setText(_currentText, false);
-        } else if (widget.text != null) {
-          _setText(widget.text!, false);
-        }
+        _setText(_currentText, false);
       }
     }
 
     // Update scrolling direction if it changed
     if (widget.preferredScrollingDirection !=
         oldWidget.preferredScrollingDirection) {
-      _metrics
-          .setPreferredScrollingDirection(widget.preferredScrollingDirection);
+      _metrics.setPreferredScrollingDirection(
+        widget.preferredScrollingDirection,
+      );
     }
 
     // Update character lists if they changed
-    if (widget.characterLists != oldWidget.characterLists) {
-      if (widget.characterLists != null) {
-        _columnManager.setCharacterLists(widget.characterLists!);
-      }
+    if (widget.characterLists != oldWidget.characterLists &&
+        widget.characterLists != null) {
+      _columnManager.setCharacterLists(widget.characterLists!);
     }
 
     // Update text if it changed
-    if (widget.text != oldWidget.text && widget.text != null) {
-      _setText(widget.text!, true);
+    if (widget.text != oldWidget.text &&
+        widget.text != null &&
+        widget.text != _currentText) {
+      setText(widget.text!);
     }
   }
 
@@ -206,38 +206,37 @@ class TickerWidgetState extends State<TickerWidget>
         color: widget.textColor,
         fontSize: widget.textSize,
       );
+    } else {
+      return TextStyle(color: widget.textColor, fontSize: widget.textSize);
     }
-    return TextStyle(
-      color: widget.textColor,
-      fontSize: widget.textSize,
-    );
   }
 
   /// Called when the animation updates
   void _onAnimationUpdate() {
-    setState(() {
-      _columnManager.setAnimationProgress(_animation.value);
-    });
+    _columnManager.setAnimationProgress(_animation.value);
+    _checkForRelayout();
+    setState(() {});
   }
 
   /// Called when the animation status changes
   void _onAnimationStatus(AnimationStatus status) {
     if (status == AnimationStatus.completed) {
+      _columnManager.onAnimationEnd();
+      _checkForRelayout();
       setState(() {
-        _columnManager.onAnimationEnd();
         _isAnimating = false;
+      });
 
-        // If we have a next text queued up, set it now
-        if (_nextText != null) {
-          final nextText = _nextText;
-          _nextText = null;
-          _setText(nextText!, true);
-        }
-      });
-    } else if (status == AnimationStatus.forward) {
-      setState(() {
-        _isAnimating = true;
-      });
+      // Start the next animation if there is one
+      if (_nextText != null) {
+        final nextText = _nextText;
+        _nextText = null;
+        Future.delayed(Duration(milliseconds: widget.animationDelay), () {
+          if (mounted) {
+            _setText(nextText!, true);
+          }
+        });
+      }
     }
   }
 
@@ -248,78 +247,73 @@ class TickerWidgetState extends State<TickerWidget>
 
   /// Sets the animation duration
   void setAnimationDuration(int durationMillis) {
-    setState(() {
+    if (_animationController.duration?.inMilliseconds != durationMillis) {
       _animationController.duration = Duration(milliseconds: durationMillis);
-    });
+    }
   }
 
   /// Sets the text to display with the option to animate
   void _setText(String text, bool animate) {
-    // If we're already animating, queue up the next text
-    if (_isAnimating) {
-      _nextText = text;
-      return;
-    }
-
-    // If the text is the same, do nothing
     if (text == _currentText) {
       return;
     }
 
-    // Update the current text
-    _currentText = text;
+    if (!animate && _isAnimating) {
+      _animationController.stop();
+      _isAnimating = false;
+      _nextText = null;
+    }
 
-    // Set the text in the column manager
-    _setTextInternal(text);
-
-    // Animate if requested
     if (animate) {
-      // Reset the animation controller
-      _animationController.reset();
+      if (_isAnimating) {
+        // Queue up this text change for after the current animation
+        _nextText = text;
+      } else {
+        _setTextInternal(text);
+        _isAnimating = true;
 
-      // Start the animation after a delay if specified
-      if (widget.animationDelay > 0) {
+        // Start the animation after the specified delay
         Future.delayed(Duration(milliseconds: widget.animationDelay), () {
           if (mounted) {
-            _animationController.forward();
+            _animationController.forward(from: 0.0);
           }
         });
-      } else {
-        _animationController.forward();
       }
     } else {
-      // If not animating, set the animation progress to the end
+      _setTextInternal(text);
       _columnManager.setAnimationProgress(1.0);
       _columnManager.onAnimationEnd();
+      _checkForRelayout();
+      setState(() {});
     }
   }
 
   /// Sets the text internally
   void _setTextInternal(String text) {
+    _currentText = text;
     _columnManager.setText(text);
-    _checkForRelayout();
   }
 
   /// Checks if the layout needs to be updated
   void _checkForRelayout() {
-    final desiredWidth = _computeDesiredWidth();
-    final desiredHeight = _computeDesiredHeight();
+    final widthChanged = _lastMeasuredDesiredWidth != _computeDesiredWidth();
+    final heightChanged = _lastMeasuredDesiredHeight != _computeDesiredHeight();
 
-    if (desiredWidth != _lastMeasuredDesiredWidth ||
-        desiredHeight != _lastMeasuredDesiredHeight) {
+    if (widthChanged || heightChanged) {
       setState(() {});
     }
   }
 
   /// Computes the desired width of the ticker
   double _computeDesiredWidth() {
-    // Get the base width from the column manager
-    final baseWidth = _columnManager.getCurrentWidth();
+    final baseWidth = widget.animateMeasurementChange
+        ? _columnManager.getCurrentWidth()
+        : _columnManager.getMinimumRequiredWidth();
 
     // Add letter spacing between characters
-    final int numColumns = _columnManager.tickerColumns.length;
-    final double letterSpacingWidth =
-        numColumns > 0 ? (numColumns - 1) * widget.letterSpacing : 0;
+    final letterSpacingWidth = _columnManager.tickerColumns.isNotEmpty
+        ? widget.letterSpacing * (_columnManager.tickerColumns.length - 1)
+        : 0.0;
 
     return baseWidth + letterSpacingWidth + widget.padding.horizontal;
   }

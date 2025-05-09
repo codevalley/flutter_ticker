@@ -1,3 +1,5 @@
+// ignore_for_file: prefer_single_quotes
+
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 
@@ -39,7 +41,7 @@ class TickerDrawMetrics {
 
     // Create a paragraph to measure text metrics
     final textPainter = TextPainter(
-      text: TextSpan(text: '0', style: textStyle),
+      text: TextSpan(text: "0", style: textStyle),
       textDirection: textDirection,
     );
 

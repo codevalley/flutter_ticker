@@ -1,3 +1,18 @@
+## 0.1.2
+
+* Fixed critical animation issues:
+  * Resolved character dropping issue in the Levenshtein algorithm implementation
+  * Improved animation continuity for smooth transitions between text states
+  * Enhanced ticker column behavior to handle edge cases properly
+* Optimized widget performance:
+  * Reduced unnecessary state updates during animations
+  * Improved animation timing and synchronization
+  * Fixed initialization issues in the interactive demo
+* Improved code structure following clean architecture principles:
+  * Fixed import paths for better code organization
+  * Corrected documentation references for better API clarity
+  * Enhanced separation between domain and presentation layers
+
 ## 0.1.1
 
 * Fixed lint issues across the library:

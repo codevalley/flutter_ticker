@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
-import '../../../src/core/utils/ticker_utils.dart';
+import '../../core/utils/ticker_utils.dart';
 import 'ticker_character_list.dart';
 import 'ticker_draw_metrics.dart';
 
-/// Represents a column of characters to be drawn on the screen.
+//// Represents a column of characters to be drawn on the screen.
 /// This class primarily handles animating within the column from one character
 /// to the next and drawing all of the intermediate states.
 class TickerColumn {
@@ -119,53 +119,70 @@ class TickerColumn {
       }
     }
 
-    // If we reached here, it means that we couldn't find a character list that contains both
-    // the current and target characters. We should warn the developer that they need to
-    // add more character lists to support the transitions they want.
-    throw ArgumentError(
-        'Couldn\'t find a character list containing both $_currentChar and $_targetChar');
+    // If we didn't find a list that contains both characters, just perform a default animation
+    // going straight from source to target
+    if (_currentCharacterList == null) {
+      if (_currentChar == _targetChar) {
+        _currentCharacterList = [_currentChar];
+        _startIndex = _endIndex = 0;
+      } else {
+        _currentCharacterList = [_currentChar, _targetChar];
+        _startIndex = 0;
+        _endIndex = 1;
+      }
+    }
   }
 
   /// Called when the animation ends
   void onAnimationEnd() {
-    _currentChar = _targetChar;
-    _currentBottomDelta = 0.0;
+    _checkForDrawMetricsChanges();
+    _minimumRequiredWidth = _currentWidth;
   }
 
   /// Checks if the draw metrics have changed and updates widths accordingly
   void _checkForDrawMetricsChanges() {
-    if (_currentWidth <= 0 && _currentChar != TickerUtils.emptyChar) {
-      _currentWidth = _metrics.getCharWidth(_currentChar);
-    }
-    if (_minimumRequiredWidth <= 0) {
-      _minimumRequiredWidth = _currentWidth;
+    final double currentTargetWidth = _metrics.getCharWidth(_targetChar);
+    // Only resize due to DrawMetrics changes when we are done with whatever animation we
+    // are running.
+    if (_currentWidth == _targetWidth && _targetWidth != currentTargetWidth) {
+      _minimumRequiredWidth = _currentWidth = _targetWidth = currentTargetWidth;
     }
   }
 
   /// Sets the progress of the animation from 0.0 to 1.0
   void setAnimationProgress(double animationProgress) {
-    // Compute the height of the character based on the current metrics
-    final double charHeight = _metrics.getCharHeight();
-
-    // Compute what position the characters should be in based on the progress
-    // of the animation.
-    final double startToEndDistance =
-        (_endIndex - _startIndex).abs().toDouble();
-    final double bottomCharPosition = startToEndDistance * animationProgress;
-
-    // The bottom character is the character that we're animating away from, which is
-    // at the bottom of the column. As the animation progresses, this character moves
-    // upwards or downwards depending on the direction of the animation.
-    double bottomCharOffsetPercentage = bottomCharPosition % 1.0;
-
-    // If we're scrolling upwards, then offset should increase from 0 to 1. If we're
-    // scrolling downwards, then offset should decrease from 1 to 0.
-    if (_endIndex < _startIndex) {
-      bottomCharOffsetPercentage = 1.0 - bottomCharOffsetPercentage;
+    if (animationProgress == 1.0) {
+      // Animation finished (or never started), set to stable state.
+      _currentChar = _targetChar;
+      _currentBottomDelta = 0.0;
+      _previousBottomDelta = 0.0;
     }
 
-    // We add the additionalDelta to handle the case where a previous animation was
-    // interrupted and we need to continue from where we left off. This ensures that the
+    final double charHeight = _metrics.getCharHeight();
+
+    // First let's find the total height of this column between the start and end chars.
+    final double totalHeight = charHeight * (_endIndex - _startIndex).abs();
+
+    // The current base is then the part of the total height that we have progressed to
+    // from the animation. For example, there might be 5 characters, each character is
+    // 2px tall, so the totalHeight is 10. If we are at 50% progress, then our baseline
+    // in this column is at 5 out of 10 (which is the 3rd character with a -50% offset
+    // to the baseline).
+    final double currentBase = animationProgress * totalHeight;
+
+    // Given the current base, we now can find which character should drawn on the bottom.
+    // Note that this position is a float. For example, if the bottomCharPosition is
+    // 4.5, it means that the bottom character is the 4th character, and it has a -50%
+    // offset relative to the baseline.
+    final double bottomCharPosition = currentBase / charHeight;
+
+    // By subtracting away the integer part of bottomCharPosition, we now have the
+    // percentage representation of the bottom char's offset.
+    final double bottomCharOffsetPercentage =
+        bottomCharPosition - bottomCharPosition.floor();
+
+    // We might have interrupted a previous animation if previousBottomDelta is not 0f.
+    // If that's the case, we need to take this delta into account so that the previous
     // character offset won't be wiped away when we start a new animation.
     // We multiply by the inverse percentage so that the offset contribution from the delta
     // progresses along with the rest of the animation (from full delta to 0).

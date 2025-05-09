@@ -75,14 +75,14 @@ class TickerColumnManager {
               columnIndex, TickerColumn(_characterLists!, _metrics));
           // Intentional fallthrough
           continue actionSame;
-          
+
         actionSame:
         case LevenshteinUtils.actionSame:
           tickerColumns[columnIndex].setTargetChar(newTextChars[textIndex]);
           columnIndex++;
           textIndex++;
           break;
-          
+
         case LevenshteinUtils.actionDelete:
           tickerColumns[columnIndex].setTargetChar(TickerUtils.emptyChar);
           columnIndex++;

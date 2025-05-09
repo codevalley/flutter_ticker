@@ -20,6 +20,30 @@ class _InteractiveDemoScreenState extends State<InteractiveDemoScreen> {
   final GlobalKey<TickerWidgetState> _counterTickerKey = GlobalKey();
   final GlobalKey<TickerWidgetState> _priceTickerKey = GlobalKey();
   final GlobalKey<TickerWidgetState> _timeTickerKey = GlobalKey();
+  final GlobalKey<TickerWidgetState> _alphabetTickerKey = GlobalKey();
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Initialize values
+    _counter = 0;
+    _price = '42.50';
+
+    // Initialize time with current time
+    final now = DateTime.now();
+    _time =
+        "${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}:${now.second.toString().padLeft(2, '0')}";
+
+    // Use a post-frame callback to ensure the ticker widgets are initialized
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      // Initialize all tickers with proper values
+      _counterTickerKey.currentState?.setText(_counter.toString());
+      _priceTickerKey.currentState?.setText(_price);
+      _timeTickerKey.currentState?.setText(_time);
+      _alphabetTickerKey.currentState?.setText('FLUTTER');
+    });
+  }
 
   void _incrementCounter() {
     setState(() {
@@ -38,6 +62,15 @@ class _InteractiveDemoScreenState extends State<InteractiveDemoScreen> {
       _time =
           "${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}:${now.second.toString().padLeft(2, '0')}";
       _timeTickerKey.currentState?.setText(_time);
+
+      // Update the alphabet ticker with alternating text
+      if (_counter % 3 == 0) {
+        _alphabetTickerKey.currentState?.setText('FLUTTER');
+      } else if (_counter % 3 == 1) {
+        _alphabetTickerKey.currentState?.setText('TICKER');
+      } else {
+        _alphabetTickerKey.currentState?.setText('AWESOME');
+      }
     });
   }
 
@@ -92,6 +125,7 @@ class _InteractiveDemoScreenState extends State<InteractiveDemoScreen> {
     _counterTickerKey.currentState?.setAnimationDuration(_animationDuration);
     _priceTickerKey.currentState?.setAnimationDuration(_animationDuration);
     _timeTickerKey.currentState?.setAnimationDuration(_animationDuration);
+    _alphabetTickerKey.currentState?.setAnimationDuration(_animationDuration);
   }
 
   @override
@@ -274,6 +308,7 @@ class _InteractiveDemoScreenState extends State<InteractiveDemoScreen> {
                       ),
                       const SizedBox(height: 8),
                       TickerWidget(
+                        key: _alphabetTickerKey,
                         text: 'FLUTTER',
                         textSize: 30,
                         textColor: Colors.orange,

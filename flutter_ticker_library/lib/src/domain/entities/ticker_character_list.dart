@@ -1,13 +1,13 @@
-import '../../../src/core/utils/ticker_utils.dart';
+import '../../core/utils/ticker_utils.dart';
 
 /// Enum for scrolling direction
 enum ScrollingDirection {
   /// Scroll from bottom to top
   up,
-  
+
   /// Scroll from top to bottom
   down,
-  
+
   /// Automatically choose the shortest path
   any
 }
@@ -22,22 +22,21 @@ enum ScrollingDirection {
 class TickerCharacterList {
   /// The number of characters in the original list
   final int numOriginalCharacters;
-  
+
   /// The saved character list will always be of the format: EMPTY, list, list
   final List<String> characterList;
-  
+
   /// A minor optimization so that we can cache the indices of each character.
   final Map<String, int> characterIndicesMap;
 
   /// Creates a new ticker character list from the given string
-  TickerCharacterList(String characters) :
-    numOriginalCharacters = characters.length,
-    characterIndicesMap = {},
-    characterList = [] {
-      
+  TickerCharacterList(String characters)
+      : numOriginalCharacters = characters.length,
+        characterIndicesMap = {},
+        characterList = [] {
     if (characters.contains(TickerUtils.emptyChar)) {
       throw ArgumentError(
-        'You cannot include TickerUtils.emptyChar in the character list.');
+          'You cannot include TickerUtils.emptyChar in the character list.');
     }
 
     final List<String> charsList = characters.split('');
@@ -49,7 +48,7 @@ class TickerCharacterList {
 
     // Initialize with empty char
     characterList.add(TickerUtils.emptyChar);
-    
+
     // Add the character list twice to handle wrap-around animations
     characterList.addAll(charsList);
     characterList.addAll(charsList);
@@ -84,27 +83,29 @@ class TickerCharacterList {
           endIndex += numOriginalCharacters;
         }
         break;
-        
+
       case ScrollingDirection.up:
         if (startIndex < endIndex) {
           startIndex += numOriginalCharacters;
         }
         break;
-        
+
       case ScrollingDirection.any:
         // see if the wrap-around animation is shorter distance than the original animation
         if (start != TickerUtils.emptyChar && end != TickerUtils.emptyChar) {
           if (endIndex < startIndex) {
             // If we are potentially going backwards
             final int nonWrapDistance = startIndex - endIndex;
-            final int wrapDistance = numOriginalCharacters - startIndex + endIndex;
+            final int wrapDistance =
+                numOriginalCharacters - startIndex + endIndex;
             if (wrapDistance < nonWrapDistance) {
               endIndex += numOriginalCharacters;
             }
           } else if (startIndex < endIndex) {
             // If we are potentially going forwards
             final int nonWrapDistance = endIndex - startIndex;
-            final int wrapDistance = numOriginalCharacters - endIndex + startIndex;
+            final int wrapDistance =
+                numOriginalCharacters - endIndex + startIndex;
             if (wrapDistance < nonWrapDistance) {
               startIndex += numOriginalCharacters;
             }
@@ -132,7 +133,7 @@ class TickerCharacterList {
 class CharacterIndices {
   /// The starting index in the character list
   final int startIndex;
-  
+
   /// The ending index in the character list
   final int endIndex;
 
