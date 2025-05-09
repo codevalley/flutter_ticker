@@ -12,8 +12,8 @@ dependencies:
     sdk: flutter
   cupertino_icons: ^1.0.8
   
-  # Local dependency to the Flutter Ticker library
-  flutter_ticker:
+  # Local dependency to the Ticker library
+  ticker:
     path: ../flutter_ticker_library
 
 dev_dependencies:

@@ -1,4 +1,4 @@
-name: flutter_ticker
+name: ticker
 description: A Flutter widget for smooth, animated text transitions with scrolling effects, similar to financial tickers or departure boards.
 version: 0.1.0
 homepage: https://github.com/yourusername/flutter_ticker

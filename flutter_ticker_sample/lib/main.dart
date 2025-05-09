@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:flutter_ticker/flutter_ticker.dart';
+import 'package:ticker/ticker.dart';
 
 void main() {
   runApp(const MyApp());

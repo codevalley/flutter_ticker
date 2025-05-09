@@ -75,13 +75,6 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
-  flutter_ticker:
-    dependency: "direct main"
-    description:
-      path: "../flutter_ticker_library"
-      relative: true
-    source: path
-    version: "0.1.0"
   leak_tracker:
     dependency: transitive
     description:
@@ -199,6 +192,13 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.7.4"
+  ticker:
+    dependency: "direct main"
+    description:
+      path: "../flutter_ticker_library"
+      relative: true
+    source: path
+    version: "0.1.0"
   vector_math:
     dependency: transitive
     description:

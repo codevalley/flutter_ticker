@@ -1,4 +1,4 @@
-library flutter_ticker;
+library ticker;
 
 // Export domain entities
 export 'src/domain/entities/ticker_character_list.dart';
