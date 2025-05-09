@@ -1,3 +1,7 @@
+## 0.1.3
+
+* Updated LICENSE and NOTICE files to meet pub.dev requirements
+
 ## 0.1.2
 
 * Fixed critical animation issues:
