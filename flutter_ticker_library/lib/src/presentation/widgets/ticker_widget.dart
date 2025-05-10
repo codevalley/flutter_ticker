@@ -14,8 +14,14 @@ import '../../../src/domain/entities/ticker_draw_metrics.dart';
 /// positioned, and then it delegates the drawing of each column of text to
 /// [TickerColumnManager].
 class TickerWidget extends StatefulWidget {
-  /// The initial text to display
+  /// The text to display (target text for animation)
   final String? text;
+
+  /// The initial text to display before animation
+  final String? initialValue;
+
+  /// Whether to animate from initialValue to text on first render
+  final bool animateOnLoad;
 
   /// The text color
   final Color textColor;
@@ -57,6 +63,8 @@ class TickerWidget extends StatefulWidget {
   const TickerWidget({
     super.key,
     this.text,
+    this.initialValue,
+    this.animateOnLoad = false,
     this.textColor = Colors.black,
     this.textSize = 12.0,
     this.textStyle,
@@ -126,8 +134,21 @@ class TickerWidgetState extends State<TickerWidget>
     if (widget.characterLists != null) {
       _columnManager.setCharacterLists(widget.characterLists!);
 
-      // Set initial text if provided
-      if (widget.text != null) {
+      // Handle initialValue and text setup
+      if (widget.initialValue != null && widget.text != null && widget.animateOnLoad) {
+        // Set initial value without animation first
+        _setText(widget.initialValue!, false);
+        // Then animate to the target text
+        Future.microtask(() {
+          if (mounted) {
+            _setText(widget.text!, true);
+          }
+        });
+      } else if (widget.initialValue != null && widget.text == null) {
+        // Only initialValue provided, no animation
+        _setText(widget.initialValue!, false);
+      } else if (widget.text != null) {
+        // Only text provided or animateOnLoad is false
         _setText(widget.text!, false);
       }
     }
@@ -187,7 +208,19 @@ class TickerWidgetState extends State<TickerWidget>
     if (widget.text != oldWidget.text &&
         widget.text != null &&
         widget.text != _currentText) {
-      setText(widget.text!);
+      // If initialValue is set and animateOnLoad is true, animate to the new text
+      if (widget.initialValue != null && widget.animateOnLoad && _currentText == widget.initialValue) {
+        setText(widget.text!);
+      } else {
+        setText(widget.text!);
+      }
+    }
+    
+    // Handle initialValue changes
+    if (widget.initialValue != oldWidget.initialValue &&
+        widget.initialValue != null &&
+        _currentText.isEmpty) {
+      _setText(widget.initialValue!, false);
     }
   }
 
@@ -243,6 +276,28 @@ class TickerWidgetState extends State<TickerWidget>
   /// Sets the text to display
   void setText(String text) {
     _setText(text, true);
+  }
+  
+  /// Triggers animation from current text to the target text
+  /// If a new text is provided, it will animate to that text
+  /// Otherwise, it will re-animate to the current text value
+  void animate([String? newText]) {
+    if (newText != null && newText != _currentText) {
+      setText(newText);
+    } else if (_currentText.isNotEmpty) {
+      // Re-animate to the current text by temporarily setting animation progress to 0
+      // and then animating back to the current text
+      final currentText = _currentText;
+      _animationController.reset();
+      _setTextInternal(currentText);
+      _isAnimating = true;
+      
+      Future.delayed(Duration(milliseconds: widget.animationDelay), () {
+        if (mounted) {
+          _animationController.forward(from: 0.0);
+        }
+      });
+    }
   }
 
   /// Sets the animation duration

@@ -10,7 +10,7 @@ class InteractiveDemoScreen extends StatefulWidget {
 
 class _InteractiveDemoScreenState extends State<InteractiveDemoScreen> {
   int _counter = 0;
-  String _price = '0.00';
+  String _price = '00.00';
   String _time = '00:00:00';
   ScrollingDirection _scrollDirection = ScrollingDirection.any;
   double _letterSpacing = 1.0;
@@ -28,7 +28,7 @@ class _InteractiveDemoScreenState extends State<InteractiveDemoScreen> {
 
     // Initialize values
     _counter = 0;
-    _price = '42.50';
+    _price = '00.00';
 
     // Initialize time with current time
     final now = DateTime.now();
@@ -53,7 +53,7 @@ class _InteractiveDemoScreenState extends State<InteractiveDemoScreen> {
       _counterTickerKey.currentState?.setText(_counter.toString());
 
       // Update the price ticker with a random price
-      final newPrice = (100 + (_counter % 900)) / 100;
+      final newPrice = 362.82 + (100 + (_counter % 900)) / 100;
       _price = newPrice.toStringAsFixed(2);
       _priceTickerKey.currentState?.setText(_price);
 
