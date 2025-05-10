@@ -1,3 +1,10 @@
+## 0.2.0
+
+* Added new features to enhance ticker functionality:
+  * Added `initialValue` property to set a starting value before animation
+  * Added `animateOnLoad` property to control whether animation happens on first render
+  * Added `animate()` method to programmatically trigger animations
+
 ## 0.1.3
 
 * Updated LICENSE and NOTICE files to meet pub.dev requirements
