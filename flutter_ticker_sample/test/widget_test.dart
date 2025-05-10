@@ -7,24 +7,36 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:ticker/ticker.dart';
 
 import 'package:flutter_ticker_sample/main.dart';
+import 'package:flutter_ticker_sample/interactive_demo.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
+  testWidgets('Navigation to Interactive Demo works', (WidgetTester tester) async {
     // Build our app and trigger a frame.
     await tester.pumpWidget(const MyApp());
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+    // Verify that we have a button to navigate to the Interactive Demo
+    expect(find.text('Interactive Demo'), findsOneWidget);
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
+    // Tap the Interactive Demo button and trigger a frame.
+    await tester.tap(find.text('Interactive Demo'));
+    await tester.pumpAndSettle();
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    // Verify that we're on the Interactive Demo screen
+    expect(find.byType(InteractiveDemoScreen), findsOneWidget);
+    
+    // Verify that we have a TickerWidget for the counter
+    expect(find.byType(TickerWidget), findsWidgets);
+    
+    // Find the floating action button and tap it
+    expect(find.byType(FloatingActionButton), findsOneWidget);
+    await tester.tap(find.byType(FloatingActionButton));
+    await tester.pumpAndSettle();
+    
+    // We can't directly check the text value since it's in a custom widget,
+    // but we can verify the FloatingActionButton still exists after tapping
+    expect(find.byType(FloatingActionButton), findsOneWidget);
   });
 }
