@@ -5,6 +5,8 @@ A Flutter widget for smooth, animated text transitions with scrolling effects. T
 ## Features
 
 - Smooth scrolling animations when text changes
+- Initial value support with optional animation on first render
+- Programmatic animation control with the animate() method
 - Customizable animation duration, curve, and direction
 - Support for different character sets (numbers, alphabets, custom characters)
 - Flexible alignment and positioning options
@@ -26,13 +28,15 @@ dependencies:
 
 ```dart
 import 'package:flutter/material.dart';
-import 'package:flutter_ticker/flutter_ticker.dart';
+import 'package:ticker/ticker.dart';
 
 class TickerDemo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TickerWidget(
-      text: "12345",
+      initialValue: "00000",  // Initial value to display
+      text: "12345",         // Target text to animate to
+      animateOnLoad: true,    // Animate from initialValue to text on first render
       textSize: 24.0,
       textColor: Colors.blue,
       characterLists: [TickerUtils.provideNumberList()],
@@ -66,7 +70,8 @@ final GlobalKey<TickerWidgetState> tickerKey = GlobalKey();
 // In your widget build method
 TickerWidget(
   key: tickerKey,
-  text: "0.00",
+  initialValue: "0.00",  // Initial value to display
+  text: "0.00",         // Starting text (same as initialValue in this case)
   textSize: 24.0,
   textColor: Colors.green,
   characterLists: [TickerUtils.provideNumberList() + "."],
@@ -74,6 +79,12 @@ TickerWidget(
 
 // Later, update the text with animation
 tickerKey.currentState?.setText("42.50");
+
+// Animate from initialValue to the current value (replay initial animation)
+tickerKey.currentState?.animate();
+
+// Animate from initialValue to a new value
+tickerKey.currentState?.animate("99.99");
 ```
 
 ### Customizing Animation Duration
@@ -93,7 +104,9 @@ The main widget that displays animated text transitions.
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| `text` | `String?` | Initial text to display |
+| `text` | `String?` | Target text to display and animate to |
+| `initialValue` | `String?` | Initial text to display before animation |
+| `animateOnLoad` | `bool` | Whether to animate from initialValue to text on first render |
 | `textColor` | `Color` | Color of the text |
 | `textSize` | `double` | Size of the text |
 | `textStyle` | `TextStyle?` | Custom text style (color and size will be overridden) |
@@ -116,6 +129,7 @@ The state object for the TickerWidget, which provides methods to control the wid
 | Method | Description |
 |--------|-------------|
 | `setText(String text)` | Updates the displayed text with animation |
+| `animate([String? newText])` | Triggers animation from initialValue to the current text, or to a new text if provided |
 | `setAnimationDuration(int durationMillis)` | Changes the animation duration |
 
 ### TickerUtils

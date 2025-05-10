@@ -80,7 +80,9 @@ class _MyHomePageState extends State<MyHomePage> {
                     const SizedBox(height: 8),
                     TickerWidget(
                       key: _numberTickerKey,
+                      initialValue: '0',
                       text: '0',
+                      animateOnLoad: false, // No initial animation for this one
                       textSize: 30,
                       textColor: Colors.blue,
                       characterLists: [TickerUtils.provideNumberList()],
@@ -115,7 +117,9 @@ class _MyHomePageState extends State<MyHomePage> {
                         ),
                         TickerWidget(
                           key: _priceTickerKey,
+                          initialValue: '0.00',
                           text: '0.00',
+                          animateOnLoad: false, // No initial animation for this one
                           textSize: 30,
                           textColor: Colors.green,
                           characterLists: [
@@ -144,7 +148,9 @@ class _MyHomePageState extends State<MyHomePage> {
                     const SizedBox(height: 8),
                     TickerWidget(
                       key: _textTickerKey,
+                      initialValue: 'LOADING',
                       text: 'FLUTTER',
+                      animateOnLoad: true, // Animate from LOADING to FLUTTER on first render
                       textSize: 30,
                       textColor: Colors.orange,
                       characterLists: [TickerUtils.provideAlphabeticalList()],
@@ -157,10 +163,30 @@ class _MyHomePageState extends State<MyHomePage> {
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Update Values',
-        child: const Icon(Icons.refresh),
+      floatingActionButton: Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          // Button to replay animations without changing values
+          FloatingActionButton(
+            onPressed: () {
+              // Demonstrate the animate() method by replaying animations
+              _numberTickerKey.currentState?.animate();
+              _priceTickerKey.currentState?.animate();
+              _textTickerKey.currentState?.animate();
+            },
+            tooltip: 'Replay Animations',
+            heroTag: 'replay',
+            child: const Icon(Icons.replay),
+          ),
+          const SizedBox(width: 16),
+          // Button to update values with animation
+          FloatingActionButton(
+            onPressed: _incrementCounter,
+            tooltip: 'Update Values',
+            heroTag: 'update',
+            child: const Icon(Icons.refresh),
+          ),
+        ],
       ),
     );
   }

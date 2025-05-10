@@ -135,7 +135,9 @@ class TickerWidgetState extends State<TickerWidget>
       _columnManager.setCharacterLists(widget.characterLists!);
 
       // Handle initialValue and text setup
-      if (widget.initialValue != null && widget.text != null && widget.animateOnLoad) {
+      if (widget.initialValue != null &&
+          widget.text != null &&
+          widget.animateOnLoad) {
         // Set initial value without animation first
         _setText(widget.initialValue!, false);
         // Then animate to the target text
@@ -209,13 +211,15 @@ class TickerWidgetState extends State<TickerWidget>
         widget.text != null &&
         widget.text != _currentText) {
       // If initialValue is set and animateOnLoad is true, animate to the new text
-      if (widget.initialValue != null && widget.animateOnLoad && _currentText == widget.initialValue) {
+      if (widget.initialValue != null &&
+          widget.animateOnLoad &&
+          _currentText == widget.initialValue) {
         setText(widget.text!);
       } else {
         setText(widget.text!);
       }
     }
-    
+
     // Handle initialValue changes
     if (widget.initialValue != oldWidget.initialValue &&
         widget.initialValue != null &&
@@ -277,27 +281,37 @@ class TickerWidgetState extends State<TickerWidget>
   void setText(String text) {
     _setText(text, true);
   }
-  
-  /// Triggers animation from current text to the target text
-  /// If a new text is provided, it will animate to that text
-  /// Otherwise, it will re-animate to the current text value
+
+  /// Triggers animation from initialValue to the target text
+  /// If a new text is provided, it will animate from initialValue to that new text
+  /// Otherwise, it will animate from initialValue to the current text value
   void animate([String? newText]) {
-    if (newText != null && newText != _currentText) {
-      setText(newText);
-    } else if (_currentText.isNotEmpty) {
-      // Re-animate to the current text by temporarily setting animation progress to 0
-      // and then animating back to the current text
-      final currentText = _currentText;
-      _animationController.reset();
-      _setTextInternal(currentText);
-      _isAnimating = true;
-      
-      Future.delayed(Duration(milliseconds: widget.animationDelay), () {
-        if (mounted) {
-          _animationController.forward(from: 0.0);
-        }
-      });
+    if (widget.initialValue == null) {
+      // If no initialValue is set, fall back to regular setText behavior
+      if (newText != null && newText != _currentText) {
+        setText(newText);
+      } else {
+        // Just replay the current animation
+        _animationController.reset();
+        _animationController.forward();
+      }
+      return;
     }
+
+    // Store the target text (either the new text or current text)
+    final targetText = newText ?? _currentText;
+
+    // First set to initialValue without animation
+    _setText(widget.initialValue!, false);
+
+    // Then animate to the target text
+    Future.microtask(() {
+      if (mounted) {
+        if (targetText != widget.initialValue) {
+          setText(targetText);
+        }
+      }
+    });
   }
 
   /// Sets the animation duration

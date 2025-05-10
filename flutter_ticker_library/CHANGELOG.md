@@ -1,9 +1,16 @@
+## 0.2.1
+
+* Enhanced the `animate()` method functionality:
+  * Improved to animate from `initialValue` to current text when called without parameters
+  * Added ability to animate from `initialValue` to a new value when called with a parameter
+  * This provides a powerful way to replay initial animations or reset to initial state
+
 ## 0.2.0
 
 * Added new features to enhance ticker functionality:
   * Added `initialValue` property to set a starting value before animation
   * Added `animateOnLoad` property to control whether animation happens on first render
-  * Added `animate()` method to programmatically trigger animations
+  * Added `animate()` method for programmatic animation control
 
 ## 0.1.3
 
