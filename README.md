@@ -2,6 +2,9 @@
 
 A clean architecture implementation of a Flutter text animation library with smooth scrolling transitions.
 
+![ticker-demo](https://github.com/user-attachments/assets/12443970-9803-4764-817d-016b927c354a)
+
+
 ## Project Structure
 
 This repository contains two main components:
