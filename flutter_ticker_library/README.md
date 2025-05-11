@@ -75,6 +75,11 @@ TickerWidget(
   textSize: 24.0,
   textColor: Colors.green,
   characterLists: [TickerUtils.provideNumberList() + "."],
+  onAnimationComplete: () {
+    // This will be called when the animation completes
+    print('Animation completed!');
+    // You can update state, trigger another animation, etc.
+  },
 )
 
 // Later, update the text with animation
@@ -107,6 +112,7 @@ The main widget that displays animated text transitions.
 | `text` | `String?` | Target text to display and animate to |
 | `initialValue` | `String?` | Initial text to display before animation |
 | `animateOnLoad` | `bool` | Whether to animate from initialValue to text on first render |
+| `onAnimationComplete` | `VoidCallback?` | Callback that is called when the animation completes |
 | `textColor` | `Color` | Color of the text |
 | `textSize` | `double` | Size of the text |
 | `textStyle` | `TextStyle?` | Custom text style (color and size will be overridden) |

@@ -59,6 +59,9 @@ class TickerWidget extends StatefulWidget {
   /// Additional padding to prevent clipping
   final EdgeInsets padding;
 
+  /// Callback that is called when the animation completes
+  final VoidCallback? onAnimationComplete;
+
   /// Creates a new ticker widget
   const TickerWidget({
     super.key,
@@ -77,6 +80,7 @@ class TickerWidget extends StatefulWidget {
     this.characterLists,
     this.letterSpacing = 1.0,
     this.padding = const EdgeInsets.all(2.0),
+    this.onAnimationComplete,
   });
 
   @override
@@ -263,6 +267,11 @@ class TickerWidgetState extends State<TickerWidget>
       setState(() {
         _isAnimating = false;
       });
+
+      // Call the onAnimationComplete callback if provided
+      if (widget.onAnimationComplete != null) {
+        widget.onAnimationComplete!();
+      }
 
       // Start the next animation if there is one
       if (_nextText != null) {

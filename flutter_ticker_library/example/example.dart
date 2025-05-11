@@ -34,6 +34,7 @@ class _MyHomePageState extends State<MyHomePage> {
   final GlobalKey<TickerWidgetState> _textTickerKey = GlobalKey();
 
   int _counter = 0;
+  String _lastCompleted = 'None';
 
   void _incrementCounter() {
     setState(() {
@@ -87,6 +88,16 @@ class _MyHomePageState extends State<MyHomePage> {
                       textColor: Colors.blue,
                       characterLists: [TickerUtils.provideNumberList()],
                       preferredScrollingDirection: ScrollingDirection.up,
+                      onAnimationComplete: () {
+                        setState(() {
+                          _lastCompleted = 'Number Ticker';
+                        });
+                      },
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Last completed: $_lastCompleted',
+                      style: Theme.of(context).textTheme.bodySmall,
                     ),
                   ],
                 ),

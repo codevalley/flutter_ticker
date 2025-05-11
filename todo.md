@@ -3,7 +3,7 @@
 - [x] **initialValue** - Property to set starting value
 - [x] **animateOnLoad** - Boolean to animate from initialValue to text on first render
 - [x] **animate() Method** - Force animation from current value to target value
-- [ ] **onAnimationComplete Callback** - Know when animation finishes
+- [x] **onAnimationComplete Callback** - Know when animation finishes
 - [ ] **transitionValue** - For replay animations, what value to transition through
 - [ ] **animationStyle** - Enum for different animation patterns (sequential/parallel)
 - [ ] **highlightChanges** - Visually emphasize just the digits that change

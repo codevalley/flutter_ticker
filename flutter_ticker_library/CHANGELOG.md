@@ -1,3 +1,9 @@
+## 0.2.2
+
+* Added `onAnimationComplete` callback to be notified when animations finish
+  * Useful for chaining animations or updating UI after transitions complete
+  * Follows clean architecture principles by providing a clear interface between presentation and business logic
+
 ## 0.2.1
 
 * Enhanced the `animate()` method functionality:
