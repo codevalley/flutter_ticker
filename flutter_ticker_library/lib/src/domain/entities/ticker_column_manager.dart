@@ -51,6 +51,11 @@ class TickerColumnManager {
     return _characterLists;
   }
   
+  /// Gets the current decimal point index
+  int getDecimalPointIndex() {
+    return _decimalPointIndex;
+  }
+  
   /// Sets the decimal point index in the text (for styling)
   void setDecimalPointIndex(int index) {
     _decimalPointIndex = index;
