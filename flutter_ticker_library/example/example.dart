@@ -31,6 +31,7 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   final GlobalKey<TickerWidgetState> _numberTickerKey = GlobalKey();
   final GlobalKey<TickerWidgetState> _priceTickerKey = GlobalKey();
+  final GlobalKey<TickerWidgetState> _styledPriceTickerKey = GlobalKey();
   final GlobalKey<TickerWidgetState> _textTickerKey = GlobalKey();
 
   int _counter = 0;
@@ -43,9 +44,12 @@ class _MyHomePageState extends State<MyHomePage> {
       // Update number ticker
       _numberTickerKey.currentState?.setText(_counter.toString());
 
-      // Update price ticker
+      // Update price ticker (normal)
       final price = (_counter * 1.25).toStringAsFixed(2);
       _priceTickerKey.currentState?.setText(price);
+      
+      // Update styled price ticker
+      _styledPriceTickerKey.currentState?.setText(price);
 
       // Update text ticker with alternating text
       if (_counter % 2 == 0) {
@@ -104,7 +108,7 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
             ),
 
-            // Price ticker
+            // Price ticker (normal)
             Card(
               margin: const EdgeInsets.all(16),
               child: Padding(
@@ -112,7 +116,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 child: Column(
                   children: [
                     Text(
-                      'Price Ticker',
+                      'Price Ticker (Normal)',
                       style: Theme.of(context).textTheme.titleMedium,
                     ),
                     const SizedBox(height: 8),
@@ -133,6 +137,60 @@ class _MyHomePageState extends State<MyHomePage> {
                           animateOnLoad: false, // No initial animation for this one
                           textSize: 30,
                           textColor: Colors.green,
+                          characterLists: [
+                            '${TickerUtils.provideNumberList()}.'
+                          ],
+                          preferredScrollingDirection: ScrollingDirection.down,
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            
+            // Price ticker (styled)
+            Card(
+              margin: const EdgeInsets.all(16),
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  children: [
+                    Text(
+                      'Price Ticker (Styled)',
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Text(
+                          '\$',
+                          style: TextStyle(
+                            fontSize: 30,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        TickerWidget(
+                          key: _styledPriceTickerKey,
+                          initialValue: '0.00',
+                          text: '0.00',
+                          animateOnLoad: false,
+                          textSize: 30,
+                          // Different styles for different parts
+                          wholeNumberStyle: const TextStyle(
+                            color: Colors.blue,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          decimalPointStyle: const TextStyle(
+                            color: Colors.red,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          decimalDigitsStyle: const TextStyle(
+                            color: Colors.green,
+                            fontWeight: FontWeight.normal,
+                            fontStyle: FontStyle.italic,
+                          ),
                           characterLists: [
                             '${TickerUtils.provideNumberList()}.'
                           ],
@@ -183,6 +241,7 @@ class _MyHomePageState extends State<MyHomePage> {
               // Demonstrate the animate() method by replaying animations
               _numberTickerKey.currentState?.animate();
               _priceTickerKey.currentState?.animate();
+              _styledPriceTickerKey.currentState?.animate();
               _textTickerKey.currentState?.animate();
             },
             tooltip: 'Replay Animations',

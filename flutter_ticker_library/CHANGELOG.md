@@ -1,3 +1,14 @@
+## 0.3.0
+
+* Added support for different text styles for different parts of numeric values:
+  * `wholeNumberStyle` - Apply custom styling to digits before the decimal point
+  * `decimalPointStyle` - Apply custom styling to the decimal point character
+  * `decimalDigitsStyle` - Apply custom styling to digits after the decimal point
+* This enables more visually distinct number displays, particularly useful for:
+  * Financial data where you want to emphasize whole numbers over decimals
+  * Scoreboard or dashboard displays with mixed styling needs
+  * Currency formatting with different visual treatments for decimal parts
+
 ## 0.2.2
 
 * Added `onAnimationComplete` callback to be notified when animations finish

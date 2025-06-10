@@ -31,6 +31,15 @@ class TickerWidget extends StatefulWidget {
 
   /// The text style
   final TextStyle? textStyle;
+  
+  /// The text style for whole numbers (before decimal point)
+  final TextStyle? wholeNumberStyle;
+  
+  /// The text style for the decimal point
+  final TextStyle? decimalPointStyle;
+  
+  /// The text style for decimal digits (after decimal point)
+  final TextStyle? decimalDigitsStyle;
 
   /// The animation duration in milliseconds
   final int animationDuration;
@@ -71,6 +80,9 @@ class TickerWidget extends StatefulWidget {
     this.textColor = Colors.black,
     this.textSize = 12.0,
     this.textStyle,
+    this.wholeNumberStyle,
+    this.decimalPointStyle,
+    this.decimalDigitsStyle,
     this.animationDuration = 950,
     this.animationCurve = Curves.easeInOut,
     this.preferredScrollingDirection = ScrollingDirection.any,
@@ -102,6 +114,9 @@ class TickerWidgetState extends State<TickerWidget>
 
   double _lastMeasuredDesiredWidth = 0;
   double _lastMeasuredDesiredHeight = 0;
+  
+  // Track the position of the decimal point for styling
+  int _decimalPointIndex = -1;
 
   @override
   void initState() {
@@ -130,7 +145,12 @@ class TickerWidgetState extends State<TickerWidget>
     );
 
     // Initialize metrics and column manager
-    _metrics = TickerDrawMetrics(textStyle: _getTextStyle());
+    _metrics = TickerDrawMetrics(
+      textStyle: _getTextStyle(),
+      wholeNumberStyle: _getWholeNumberStyle(),
+      decimalPointStyle: _getDecimalPointStyle(),
+      decimalDigitsStyle: _getDecimalDigitsStyle(),
+    );
     _metrics.setPreferredScrollingDirection(widget.preferredScrollingDirection);
     _columnManager = TickerColumnManager(_metrics);
 
@@ -182,9 +202,17 @@ class TickerWidgetState extends State<TickerWidget>
     // Update text style if it changed
     if (widget.textColor != oldWidget.textColor ||
         widget.textSize != oldWidget.textSize ||
-        widget.textStyle != oldWidget.textStyle) {
+        widget.textStyle != oldWidget.textStyle ||
+        widget.wholeNumberStyle != oldWidget.wholeNumberStyle ||
+        widget.decimalPointStyle != oldWidget.decimalPointStyle ||
+        widget.decimalDigitsStyle != oldWidget.decimalDigitsStyle) {
       _textPainter.text = TextSpan(text: '', style: _getTextStyle());
-      _metrics = TickerDrawMetrics(textStyle: _getTextStyle());
+      _metrics = TickerDrawMetrics(
+        textStyle: _getTextStyle(),
+        wholeNumberStyle: _getWholeNumberStyle(),
+        decimalPointStyle: _getDecimalPointStyle(),
+        decimalDigitsStyle: _getDecimalDigitsStyle(),
+      );
       _metrics.setPreferredScrollingDirection(
         widget.preferredScrollingDirection,
       );
@@ -240,7 +268,7 @@ class TickerWidgetState extends State<TickerWidget>
     super.dispose();
   }
 
-  /// Gets the text style to use for the ticker
+  /// Gets the default text style to use for the ticker
   TextStyle _getTextStyle() {
     if (widget.textStyle != null) {
       return widget.textStyle!.copyWith(
@@ -249,6 +277,39 @@ class TickerWidgetState extends State<TickerWidget>
       );
     } else {
       return TextStyle(color: widget.textColor, fontSize: widget.textSize);
+    }
+  }
+  
+  /// Gets the text style for whole numbers
+  TextStyle _getWholeNumberStyle() {
+    if (widget.wholeNumberStyle != null) {
+      return widget.wholeNumberStyle!.copyWith(
+        fontSize: widget.textSize,
+      );
+    } else {
+      return _getTextStyle();
+    }
+  }
+  
+  /// Gets the text style for decimal point
+  TextStyle _getDecimalPointStyle() {
+    if (widget.decimalPointStyle != null) {
+      return widget.decimalPointStyle!.copyWith(
+        fontSize: widget.textSize,
+      );
+    } else {
+      return _getTextStyle();
+    }
+  }
+  
+  /// Gets the text style for decimal digits
+  TextStyle _getDecimalDigitsStyle() {
+    if (widget.decimalDigitsStyle != null) {
+      return widget.decimalDigitsStyle!.copyWith(
+        fontSize: widget.textSize,
+      );
+    } else {
+      return _getTextStyle();
     }
   }
 
@@ -341,6 +402,10 @@ class TickerWidgetState extends State<TickerWidget>
       _isAnimating = false;
       _nextText = null;
     }
+    
+    // Find the decimal point position for styling
+    _decimalPointIndex = text.indexOf('.');
+    _columnManager.setDecimalPointIndex(_decimalPointIndex);
 
     if (animate) {
       if (_isAnimating) {

@@ -28,6 +28,9 @@ class TickerColumn {
 
   /// The ending index in the character list
   int _endIndex = 0;
+  
+  /// The position index of this column in the text (for styling)
+  int _positionIndex = -1;
 
   // Drawing state variables that get updated whenever animation progress gets updated
   int _bottomCharIndex = 0;
@@ -52,6 +55,11 @@ class TickerColumn {
   void setCharacterLists(List<TickerCharacterList> characterLists) {
     _characterLists = characterLists;
   }
+  
+  /// Sets the position index of this column in the text (for styling)
+  void setPositionIndex(int index) {
+    _positionIndex = index;
+  }
 
   /// Tells the column that the next character it should show is [targetChar].
   /// This change can either be animated or instant depending on the animation
@@ -60,7 +68,7 @@ class TickerColumn {
     // Set the current and target characters for the animation
     _targetChar = targetChar;
     _sourceWidth = _currentWidth;
-    _targetWidth = _metrics.getCharWidth(targetChar);
+    _targetWidth = _metrics.getCharWidth(targetChar, _positionIndex);
     _minimumRequiredWidth =
         _sourceWidth > _targetWidth ? _sourceWidth : _targetWidth;
 
@@ -141,7 +149,7 @@ class TickerColumn {
 
   /// Checks if the draw metrics have changed and updates widths accordingly
   void _checkForDrawMetricsChanges() {
-    final double currentTargetWidth = _metrics.getCharWidth(_targetChar);
+    final double currentTargetWidth = _metrics.getCharWidth(_targetChar, _positionIndex);
     // Only resize due to DrawMetrics changes when we are done with whatever animation we
     // are running.
     if (_currentWidth == _targetWidth && _targetWidth != currentTargetWidth) {
@@ -261,10 +269,16 @@ class TickerColumn {
       // Save the canvas state
       canvas.save();
 
-      // Update the text painter with the character to draw
+      // Get the character to draw
+      final String character = characterList[index];
+      
+      // Get the appropriate text style based on position
+      final TextStyle style = _metrics.getTextStyleForPosition(_positionIndex, character);
+
+      // Update the text painter with the character to draw and appropriate style
       textPainter.text = TextSpan(
-        text: characterList[index],
-        style: textPainter.text!.style,
+        text: character,
+        style: style,
       );
 
       // Layout the text to get its metrics

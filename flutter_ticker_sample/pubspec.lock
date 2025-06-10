@@ -198,7 +198,7 @@ packages:
       path: "../flutter_ticker_library"
       relative: true
     source: path
-    version: "0.1.0"
+    version: "0.2.2"
   vector_math:
     dependency: transitive
     description:

@@ -23,6 +23,9 @@ class TickerColumnManager {
 
   /// The set of characters supported by the character lists
   Set<String>? _supportedCharacters;
+  
+  /// Index of the decimal point in the text (for styling)
+  int _decimalPointIndex = -1;
 
   /// Creates a new ticker column manager with the given metrics
   TickerColumnManager(this._metrics);
@@ -46,6 +49,17 @@ class TickerColumnManager {
   /// Gets the character lists used for animations
   List<TickerCharacterList>? getCharacterLists() {
     return _characterLists;
+  }
+  
+  /// Sets the decimal point index in the text (for styling)
+  void setDecimalPointIndex(int index) {
+    _decimalPointIndex = index;
+    _metrics.setDecimalPointIndex(index);
+    
+    // Update position index for each column
+    for (int i = 0; i < tickerColumns.length; i++) {
+      tickerColumns[i].setPositionIndex(i);
+    }
   }
 
   /// Tell the column manager the new target text that it should display.
@@ -91,6 +105,11 @@ class TickerColumnManager {
         default:
           throw ArgumentError('Unknown action: ${actions[i]}');
       }
+    }
+    
+    // Update position index for each column after text changes
+    for (int i = 0; i < tickerColumns.length; i++) {
+      tickerColumns[i].setPositionIndex(i);
     }
   }
 

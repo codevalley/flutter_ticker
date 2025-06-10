@@ -82,6 +82,17 @@ class _MainScreenState extends State<MainScreen> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
+                      builder: (context) => const StyledDemoScreen()),
+                );
+              },
+              child: const Text('Styled Demo'),
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
                       builder: (context) => const InteractiveDemoScreen()),
                 );
               },
@@ -542,6 +553,286 @@ class _SlideDirectionDemoScreenState
     setState(() {
       _currentText = getRandomNumber(5);
       _tickerKey.currentState?.setText(_currentText);
+    });
+  }
+}
+
+// Styled Demo Screen to showcase different text styles
+class StyledDemoScreen extends BaseDemoScreen {
+  const StyledDemoScreen({super.key});
+
+  @override
+  State<StyledDemoScreen> createState() => _StyledDemoScreenState();
+}
+
+class _StyledDemoScreenState extends BaseDemoScreenState<StyledDemoScreen> {
+  final GlobalKey<TickerWidgetState> _standardTickerKey = GlobalKey();
+  final GlobalKey<TickerWidgetState> _boldWholeNumbersTickerKey = GlobalKey();
+  final GlobalKey<TickerWidgetState> _coloredPartsTickerKey = GlobalKey();
+  final GlobalKey<TickerWidgetState> _mixedStylesTickerKey = GlobalKey();
+  final GlobalKey<TickerWidgetState> _currencyTickerKey = GlobalKey();
+
+  @override
+  void initState() {
+    super.initState();
+    // Set initial values
+    _standardTickerKey.currentState?.setText('1234.56');
+    _boldWholeNumbersTickerKey.currentState?.setText('1234.56');
+    _coloredPartsTickerKey.currentState?.setText('1234.56');
+    _mixedStylesTickerKey.currentState?.setText('1234.56');
+    _currencyTickerKey.currentState?.setText('1234.56');
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Styled Demo'),
+        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        actions: [
+          // Add a toggle button for update mode
+          IconButton(
+            icon: Icon(_isContinuousMode ? Icons.loop : Icons.touch_app),
+            onPressed: toggleUpdateMode,
+            tooltip: _isContinuousMode ? 'Switch to Manual Mode' : 'Switch to Continuous Mode',
+          ),
+        ],
+      ),
+      body: SingleChildScrollView(
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // Mode indicator
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Text(
+                  'Mode: ${_isContinuousMode ? "Continuous (Auto)" : "Manual (Tap to Update)"}',
+                  style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: _isContinuousMode ? Colors.blue : Colors.green,
+                  ),
+                ),
+              ),
+              
+              // Manual update button (only visible in manual mode)
+              if (!_isContinuousMode)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 16.0),
+                  child: ElevatedButton.icon(
+                    onPressed: manualUpdate,
+                    icon: const Icon(Icons.refresh),
+                    label: const Text('Update Values'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.green,
+                      foregroundColor: Colors.white,
+                    ),
+                  ),
+                ),
+                
+              // Standard Ticker (no custom styling)
+              Card(
+                margin: const EdgeInsets.all(16.0),
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    children: [
+                      Text(
+                        'Standard (No Custom Styling)',
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
+                      const SizedBox(height: 8),
+                      TickerWidget(
+                        key: _standardTickerKey,
+                        text: '1234.56',
+                        textSize: 30,
+                        textColor: Colors.black,
+                        characterLists: [
+                          '${TickerUtils.provideNumberList()}.'
+                        ],
+                        preferredScrollingDirection: ScrollingDirection.up,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
+              // Bold Whole Numbers Ticker
+              Card(
+                margin: const EdgeInsets.all(16.0),
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    children: [
+                      Text(
+                        'Bold Whole Numbers',
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
+                      const SizedBox(height: 8),
+                      TickerWidget(
+                        key: _boldWholeNumbersTickerKey,
+                        text: '1234.56',
+                        textSize: 30,
+                        textColor: Colors.black,
+                        wholeNumberStyle: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                        ),
+                        characterLists: [
+                          '${TickerUtils.provideNumberList()}.'
+                        ],
+                        preferredScrollingDirection: ScrollingDirection.up,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
+              // Colored Parts Ticker
+              Card(
+                margin: const EdgeInsets.all(16.0),
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    children: [
+                      Text(
+                        'Colored Parts',
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
+                      const SizedBox(height: 8),
+                      TickerWidget(
+                        key: _coloredPartsTickerKey,
+                        text: '1234.56',
+                        textSize: 30,
+                        wholeNumberStyle: const TextStyle(
+                          color: Colors.blue,
+                        ),
+                        decimalPointStyle: const TextStyle(
+                          color: Colors.red,
+                        ),
+                        decimalDigitsStyle: const TextStyle(
+                          color: Colors.green,
+                        ),
+                        characterLists: [
+                          '${TickerUtils.provideNumberList()}.'
+                        ],
+                        preferredScrollingDirection: ScrollingDirection.up,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
+              // Mixed Styles Ticker
+              Card(
+                margin: const EdgeInsets.all(16.0),
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    children: [
+                      Text(
+                        'Mixed Styles',
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
+                      const SizedBox(height: 8),
+                      TickerWidget(
+                        key: _mixedStylesTickerKey,
+                        text: '1234.56',
+                        textSize: 30,
+                        wholeNumberStyle: const TextStyle(
+                          color: Colors.purple,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: 'Courier',
+                        ),
+                        decimalPointStyle: const TextStyle(
+                          color: Colors.red,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 35, // Slightly larger decimal point
+                        ),
+                        decimalDigitsStyle: const TextStyle(
+                          color: Colors.teal,
+                          fontStyle: FontStyle.italic,
+                        ),
+                        characterLists: [
+                          '${TickerUtils.provideNumberList()}.'
+                        ],
+                        preferredScrollingDirection: ScrollingDirection.up,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
+              // Currency Ticker with Symbol
+              Card(
+                margin: const EdgeInsets.all(16.0),
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    children: [
+                      Text(
+                        'Currency with Symbol',
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
+                      const SizedBox(height: 8),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Text(
+                            '\$',
+                            style: TextStyle(
+                              fontSize: 30,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.green,
+                            ),
+                          ),
+                          TickerWidget(
+                            key: _currencyTickerKey,
+                            text: '1234.56',
+                            textSize: 30,
+                            wholeNumberStyle: const TextStyle(
+                              color: Colors.green,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            decimalPointStyle: const TextStyle(
+                              color: Colors.green,
+                            ),
+                            decimalDigitsStyle: const TextStyle(
+                              color: Colors.green,
+                              fontSize: 24, // Smaller decimal part
+                            ),
+                            characterLists: [
+                              '${TickerUtils.provideNumberList()}.'
+                            ],
+                            preferredScrollingDirection: ScrollingDirection.down,
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  @override
+  void onUpdate() {
+    setState(() {
+      // Generate random price with 2 decimal places
+      final intPart = BaseDemoScreenState.random.nextInt(10000);
+      final decimalPart = BaseDemoScreenState.random.nextInt(100).toString().padLeft(2, '0');
+      final newValue = '$intPart.$decimalPart';
+      
+      // Update all tickers with the same value
+      _standardTickerKey.currentState?.setText(newValue);
+      _boldWholeNumbersTickerKey.currentState?.setText(newValue);
+      _coloredPartsTickerKey.currentState?.setText(newValue);
+      _mixedStylesTickerKey.currentState?.setText(newValue);
+      _currencyTickerKey.currentState?.setText(newValue);
     });
   }
 }

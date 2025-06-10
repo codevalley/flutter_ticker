@@ -12,6 +12,7 @@ A Flutter widget for smooth, animated text transitions with scrolling effects. T
 - Flexible alignment and positioning options
 - Precise character spacing and layout control
 - Optimized text rendering with custom painting
+- Different text styles for whole numbers, decimal point, and decimal digits
 
 ## Installation
 
@@ -19,7 +20,7 @@ Add this to your package's `pubspec.yaml` file:
 
 ```yaml
 dependencies:
-  flutter_ticker: ^0.1.0
+  flutter_ticker: ^0.3.0
 ```
 
 ## Usage
@@ -92,6 +93,33 @@ tickerKey.currentState?.animate();
 tickerKey.currentState?.animate("99.99");
 ```
 
+### Styling Different Parts of Numeric Values
+
+```dart
+// For displaying currency with emphasized whole numbers and smaller decimal digits
+TickerWidget(
+  text: "1234.56",
+  textSize: 30.0,
+  // Style for whole numbers (before decimal point)
+  wholeNumberStyle: const TextStyle(
+    color: Colors.green,
+    fontWeight: FontWeight.bold,
+  ),
+  // Style for decimal point
+  decimalPointStyle: const TextStyle(
+    color: Colors.green,
+  ),
+  // Style for decimal digits (after decimal point)
+  decimalDigitsStyle: const TextStyle(
+    color: Colors.green,
+    fontSize: 24.0, // Smaller decimal digits
+    fontStyle: FontStyle.italic,
+  ),
+  characterLists: [TickerUtils.provideNumberList() + "."],
+  preferredScrollingDirection: ScrollingDirection.down,
+)
+```
+
 ### Customizing Animation Duration
 
 ```dart
@@ -116,6 +144,9 @@ The main widget that displays animated text transitions.
 | `textColor` | `Color` | Color of the text |
 | `textSize` | `double` | Size of the text |
 | `textStyle` | `TextStyle?` | Custom text style (color and size will be overridden) |
+| `wholeNumberStyle` | `TextStyle?` | Style for digits before the decimal point |
+| `decimalPointStyle` | `TextStyle?` | Style for the decimal point character |
+| `decimalDigitsStyle` | `TextStyle?` | Style for digits after the decimal point |
 | `animationDuration` | `int` | Duration of the animation in milliseconds |
 | `animationCurve` | `Curve` | Animation curve to use |
 | `preferredScrollingDirection` | `ScrollingDirection` | Preferred direction for scrolling animations |
