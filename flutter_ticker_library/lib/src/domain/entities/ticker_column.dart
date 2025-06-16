@@ -95,6 +95,11 @@ class TickerColumn {
     return _targetChar;
   }
 
+  /// Sets the current character (used for animation start configuration)
+  void setCurrentChar(String currentChar) {
+    _currentChar = currentChar;
+  }
+
   /// Gets the current width of the column
   double getCurrentWidth() {
     _checkForDrawMetricsChanges();

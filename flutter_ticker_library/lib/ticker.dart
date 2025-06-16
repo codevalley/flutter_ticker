@@ -1,6 +1,7 @@
 library ticker;
 
 // Export domain entities
+export 'src/domain/entities/ticker_animation_start_config.dart';
 export 'src/domain/entities/ticker_character_list.dart';
 export 'src/domain/entities/ticker_column.dart';
 export 'src/domain/entities/ticker_column_manager.dart';

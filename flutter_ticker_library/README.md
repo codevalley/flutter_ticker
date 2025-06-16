@@ -127,6 +127,58 @@ TickerWidget(
 tickerKey.currentState?.setAnimationDuration(1200);
 ```
 
+### Configuring Initial Animation Starting Position
+
+By default, ticker animations start from the first character (e.g., '0' for numbers) on initial load. You can customize this behavior using the `animationStartConfig` parameter:
+
+```dart
+// Default behavior - initial animation starts from first character (e.g., '0')
+TickerWidget(
+  text: "123",
+  // No animationStartConfig needed - defaults to starting from '0'
+  characterLists: [TickerUtils.provideNumberList()],
+)
+
+// Explicitly disable initial animation (show value immediately)
+TickerWidget(
+  text: "456",
+  animationStartConfig: const TickerAnimationStartConfig.current(),
+  characterLists: [TickerUtils.provideNumberList()],
+)
+
+// Initial animation starts from a specific character
+TickerWidget(
+  text: "789",
+  animationStartConfig: const TickerAnimationStartConfig.specific('5'),
+  characterLists: [TickerUtils.provideNumberList()],
+)
+
+// Initial animation starts from a random character
+TickerWidget(
+  text: "321",
+  animationStartConfig: TickerAnimationStartConfig.random(),
+  characterLists: [TickerUtils.provideNumberList()],
+)
+
+// Initial animation starts from the last character (e.g., '9' for numbers)
+TickerWidget(
+  text: "654",
+  animationStartConfig: const TickerAnimationStartConfig.last(),
+  characterLists: [TickerUtils.provideNumberList()],
+)
+```
+
+#### Animation Start Configuration Options
+
+- **Default (no config)**: Initial animation starts from the first character in the character list (e.g., '0' for numbers)
+- **`TickerAnimationStartConfig.current()`**: No initial animation - shows target value immediately
+- **`TickerAnimationStartConfig.first()`**: Same as default - initial animation starts from the first character
+- **`TickerAnimationStartConfig.last()`**: Initial animation starts from the last character in the character list
+- **`TickerAnimationStartConfig.random()`**: Initial animation starts from a random character
+- **`TickerAnimationStartConfig.specific(char)`**: Initial animation starts from a specific character
+
+**Important**: This configuration only applies to the initial/first animation. All subsequent animations maintain natural fluidity by starting from the current character position.
+
 ## API Reference
 
 ### TickerWidget
@@ -141,6 +193,7 @@ The main widget that displays animated text transitions.
 | `initialValue` | `String?` | Initial text to display before animation |
 | `animateOnLoad` | `bool` | Whether to animate from initialValue to text on first render |
 | `onAnimationComplete` | `VoidCallback?` | Callback that is called when the animation completes |
+| `animationStartConfig` | `TickerAnimationStartConfig?` | Configuration for controlling animation starting position |
 | `textColor` | `Color` | Color of the text |
 | `textSize` | `double` | Size of the text |
 | `textStyle` | `TextStyle?` | Custom text style (color and size will be overridden) |

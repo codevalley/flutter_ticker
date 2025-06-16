@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../src/core/utils/levenshtein_utils.dart';
 import '../../../src/core/utils/ticker_utils.dart';
+import 'ticker_animation_start_config.dart';
 import 'ticker_character_list.dart';
 import 'ticker_column.dart';
 import 'ticker_draw_metrics.dart';
@@ -26,6 +27,12 @@ class TickerColumnManager {
   
   /// Index of the decimal point in the text (for styling)
   int _decimalPointIndex = -1;
+
+  /// Configuration for animation starting behavior
+  TickerAnimationStartConfig? _animationStartConfig;
+
+  /// Whether this is the first animation (used for applyToAllAnimations logic)
+  bool _isFirstAnimation = true;
 
   /// Creates a new ticker column manager with the given metrics
   TickerColumnManager(this._metrics);
@@ -67,6 +74,11 @@ class TickerColumnManager {
     }
   }
 
+  /// Sets the animation start configuration
+  void setAnimationStartConfig(TickerAnimationStartConfig? config) {
+    _animationStartConfig = config;
+  }
+
   /// Tell the column manager the new target text that it should display.
   void setText(String text) {
     if (_characterLists == null) {
@@ -97,7 +109,7 @@ class TickerColumnManager {
 
         actionSame:
         case LevenshteinUtils.actionSame:
-          tickerColumns[columnIndex].setTargetChar(newTextChars[textIndex]);
+          _setTargetCharWithStartConfig(tickerColumns[columnIndex], newTextChars[textIndex]);
           columnIndex++;
           textIndex++;
           break;
@@ -116,6 +128,38 @@ class TickerColumnManager {
     for (int i = 0; i < tickerColumns.length; i++) {
       tickerColumns[i].setPositionIndex(i);
     }
+    
+    // Mark that we've completed the first animation
+    _isFirstAnimation = false;
+  }
+
+  /// Helper method to set target character with animation start configuration
+  void _setTargetCharWithStartConfig(TickerColumn column, String targetChar) {
+    // Apply start configuration on the very first animation
+    // Default behavior is to start from first character (backward compatibility)
+    final bool shouldApplyConfig = _isFirstAnimation;
+    
+    if (shouldApplyConfig && _characterLists != null) {
+      // Use provided config or default to first character for backward compatibility
+      final config = _animationStartConfig ?? const TickerAnimationStartConfig.first();
+      // Find the appropriate character list for this target character
+              for (final characterList in _characterLists!) {
+          if (characterList.getSupportedCharacters().contains(targetChar)) {
+            // Get the starting character from the configuration
+            final String startChar = config.getStartingCharacter(
+              characterList.characterList.sublist(1, characterList.numOriginalCharacters + 1),
+              targetChar
+            );
+          
+          // Set the current character to the start character first
+          column.setCurrentChar(startChar);
+          break;
+        }
+      }
+    }
+    
+    // Set the target character
+    column.setTargetChar(targetChar);
   }
 
   /// Called when the animation ends

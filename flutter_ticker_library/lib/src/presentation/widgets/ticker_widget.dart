@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../src/core/utils/ticker_utils.dart';
+import '../../../src/domain/entities/ticker_animation_start_config.dart';
 import '../../../src/domain/entities/ticker_character_list.dart';
 import '../../../src/domain/entities/ticker_column_manager.dart';
 import '../../../src/domain/entities/ticker_draw_metrics.dart';
@@ -71,6 +72,9 @@ class TickerWidget extends StatefulWidget {
   /// Callback that is called when the animation completes
   final VoidCallback? onAnimationComplete;
 
+  /// Configuration for animation starting behavior
+  final TickerAnimationStartConfig? animationStartConfig;
+
   /// Creates a new ticker widget
   const TickerWidget({
     super.key,
@@ -93,6 +97,7 @@ class TickerWidget extends StatefulWidget {
     this.letterSpacing = 1.0,
     this.padding = const EdgeInsets.all(2.0),
     this.onAnimationComplete,
+    this.animationStartConfig,
   });
 
   @override
@@ -157,8 +162,15 @@ class TickerWidgetState extends State<TickerWidget>
     // Set character lists if provided
     if (widget.characterLists != null) {
       _columnManager.setCharacterLists(widget.characterLists!);
+    }
 
-      // Handle initialValue and text setup
+    // Set animation start configuration if provided
+    if (widget.animationStartConfig != null) {
+      _columnManager.setAnimationStartConfig(widget.animationStartConfig!);
+    }
+
+    // Handle initialValue and text setup
+    if (widget.characterLists != null) {
       if (widget.initialValue != null &&
           widget.text != null &&
           widget.animateOnLoad) {
@@ -236,6 +248,11 @@ class TickerWidgetState extends State<TickerWidget>
     if (widget.characterLists != oldWidget.characterLists &&
         widget.characterLists != null) {
       _columnManager.setCharacterLists(widget.characterLists!);
+    }
+
+    // Update animation start configuration if it changed
+    if (widget.animationStartConfig != oldWidget.animationStartConfig) {
+      _columnManager.setAnimationStartConfig(widget.animationStartConfig);
     }
 
     // Update text if it changed

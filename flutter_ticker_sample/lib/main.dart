@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:ticker/ticker.dart';
 
+import 'animation_start_demo.dart';
 import 'interactive_demo.dart';
 
 void main() {
@@ -97,6 +98,17 @@ class _MainScreenState extends State<MainScreen> {
                 );
               },
               child: const Text('Interactive Demo'),
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const AnimationStartDemoScreen()),
+                );
+              },
+              child: const Text('Animation Start Demo'),
             ),
           ],
         ),
