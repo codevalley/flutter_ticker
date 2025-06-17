@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:ticker/ticker.dart';
 
 import 'animation_start_demo.dart';
+import 'character_count_demo.dart';
 import 'interactive_demo.dart';
 
 void main() {
@@ -109,6 +110,17 @@ class _MainScreenState extends State<MainScreen> {
                 );
               },
               child: const Text('Animation Start Demo'),
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const CharacterCountDemoScreen()),
+                );
+              },
+              child: const Text('Character Count Demo'),
             ),
           ],
         ),
