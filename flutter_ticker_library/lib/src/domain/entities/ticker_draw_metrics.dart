@@ -11,13 +11,13 @@ import 'ticker_character_list.dart';
 class TickerDrawMetrics {
   /// The text style used for measuring and drawing text
   final TextStyle textStyle;
-  
+
   /// The text style for whole numbers (before decimal point)
   final TextStyle wholeNumberStyle;
-  
+
   /// The text style for the decimal point
   final TextStyle decimalPointStyle;
-  
+
   /// The text style for decimal digits (after decimal point)
   final TextStyle decimalDigitsStyle;
 
@@ -26,13 +26,13 @@ class TickerDrawMetrics {
 
   /// Cache of character widths for performance optimization
   final Map<String, double> _charWidths = {};
-  
+
   /// Cache of character widths for whole numbers
   final Map<String, double> _wholeNumberCharWidths = {};
-  
+
   /// Cache of decimal point width
   double _decimalPointWidth = 0;
-  
+
   /// Cache of character widths for decimal digits
   final Map<String, double> _decimalDigitsCharWidths = {};
 
@@ -44,7 +44,7 @@ class TickerDrawMetrics {
 
   /// The preferred scrolling direction for animations
   ScrollingDirection _preferredScrollingDirection = ScrollingDirection.any;
-  
+
   /// Index of the decimal point in the text (for styling)
   int _decimalPointIndex = -1;
 
@@ -55,10 +55,9 @@ class TickerDrawMetrics {
     TextStyle? decimalPointStyle,
     TextStyle? decimalDigitsStyle,
     this.textDirection = TextDirection.ltr,
-  }) : 
-    wholeNumberStyle = wholeNumberStyle ?? textStyle,
-    decimalPointStyle = decimalPointStyle ?? textStyle,
-    decimalDigitsStyle = decimalDigitsStyle ?? textStyle {
+  })  : wholeNumberStyle = wholeNumberStyle ?? textStyle,
+        decimalPointStyle = decimalPointStyle ?? textStyle,
+        decimalDigitsStyle = decimalDigitsStyle ?? textStyle {
     _invalidate();
   }
 
@@ -85,23 +84,23 @@ class TickerDrawMetrics {
     _charBaseline =
         textPainter.computeDistanceToActualBaseline(TextBaseline.alphabetic);
   }
-  
+
   /// Sets the decimal point index in the text
   void setDecimalPointIndex(int index) {
     _decimalPointIndex = index;
   }
-  
+
   /// Determines the appropriate TextStyle for a character at a given position
   TextStyle getTextStyleForPosition(int position, String character) {
     if (position < 0) {
       return textStyle;
     }
-    
+
     if (_decimalPointIndex == -1) {
       // No decimal point in the text, use whole number style for all characters
       return wholeNumberStyle;
     }
-    
+
     if (position < _decimalPointIndex) {
       // Character is before the decimal point
       return wholeNumberStyle;
@@ -119,11 +118,11 @@ class TickerDrawMetrics {
     if (character == TickerUtils.emptyChar) {
       return 0;
     }
-    
+
     // Determine which cache and style to use based on position
     late Map<String, double> widthCache;
     late TextStyle style;
-    
+
     if (position < 0 || _decimalPointIndex == -1) {
       // Default case: use the primary cache and style
       widthCache = _charWidths;
@@ -181,10 +180,10 @@ class TickerDrawMetrics {
     if (character == TickerUtils.emptyChar) {
       return Size(0, _charHeight);
     }
-    
+
     // Determine which style to use based on position
     TextStyle style;
-    
+
     if (position < 0 || _decimalPointIndex == -1) {
       // Default case: use the primary style
       style = textStyle;
@@ -210,8 +209,8 @@ class TickerDrawMetrics {
   }
 
   /// Calculates the ideal spacing between two characters
-  double getIdealSpacingBetween(
-      String char1, String char2, double baseSpacing, [int position = -1]) {
+  double getIdealSpacingBetween(String char1, String char2, double baseSpacing,
+      [int position = -1]) {
     // If either character is empty, use base spacing
     if (char1 == TickerUtils.emptyChar || char2 == TickerUtils.emptyChar) {
       return baseSpacing;

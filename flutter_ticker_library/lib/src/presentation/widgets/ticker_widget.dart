@@ -32,13 +32,13 @@ class TickerWidget extends StatefulWidget {
 
   /// The text style
   final TextStyle? textStyle;
-  
+
   /// The text style for whole numbers (before decimal point)
   final TextStyle? wholeNumberStyle;
-  
+
   /// The text style for the decimal point
   final TextStyle? decimalPointStyle;
-  
+
   /// The text style for decimal digits (after decimal point)
   final TextStyle? decimalDigitsStyle;
 
@@ -119,7 +119,7 @@ class TickerWidgetState extends State<TickerWidget>
 
   double _lastMeasuredDesiredWidth = 0;
   double _lastMeasuredDesiredHeight = 0;
-  
+
   // Track the position of the decimal point for styling
   int _decimalPointIndex = -1;
 
@@ -296,7 +296,7 @@ class TickerWidgetState extends State<TickerWidget>
       return TextStyle(color: widget.textColor, fontSize: widget.textSize);
     }
   }
-  
+
   /// Gets the text style for whole numbers
   TextStyle _getWholeNumberStyle() {
     if (widget.wholeNumberStyle != null) {
@@ -307,7 +307,7 @@ class TickerWidgetState extends State<TickerWidget>
       return _getTextStyle();
     }
   }
-  
+
   /// Gets the text style for decimal point
   TextStyle _getDecimalPointStyle() {
     if (widget.decimalPointStyle != null) {
@@ -318,7 +318,7 @@ class TickerWidgetState extends State<TickerWidget>
       return _getTextStyle();
     }
   }
-  
+
   /// Gets the text style for decimal digits
   TextStyle _getDecimalDigitsStyle() {
     if (widget.decimalDigitsStyle != null) {
@@ -419,7 +419,7 @@ class TickerWidgetState extends State<TickerWidget>
       _isAnimating = false;
       _nextText = null;
     }
-    
+
     // Find the decimal point position for styling
     _decimalPointIndex = text.indexOf('.');
     _columnManager.setDecimalPointIndex(_decimalPointIndex);

@@ -164,7 +164,7 @@ abstract class BaseDemoScreenState<T extends BaseDemoScreen> extends State<T> {
       }
     });
   }
-  
+
   // Toggle between continuous and manual modes
   void toggleUpdateMode() {
     setState(() {
@@ -176,7 +176,7 @@ abstract class BaseDemoScreenState<T extends BaseDemoScreen> extends State<T> {
       }
     });
   }
-  
+
   // Manually trigger an update (for manual mode)
   void manualUpdate() {
     if (!_isContinuousMode) {
@@ -231,7 +231,9 @@ class _BasicDemoScreenState extends BaseDemoScreenState<BasicDemoScreen> {
           IconButton(
             icon: Icon(_isContinuousMode ? Icons.loop : Icons.touch_app),
             onPressed: toggleUpdateMode,
-            tooltip: _isContinuousMode ? 'Switch to Manual Mode' : 'Switch to Continuous Mode',
+            tooltip: _isContinuousMode
+                ? 'Switch to Manual Mode'
+                : 'Switch to Continuous Mode',
           ),
         ],
       ),
@@ -246,12 +248,12 @@ class _BasicDemoScreenState extends BaseDemoScreenState<BasicDemoScreen> {
                 child: Text(
                   'Mode: ${_isContinuousMode ? "Continuous (Auto)" : "Manual (Tap to Update)"}',
                   style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: _isContinuousMode ? Colors.blue : Colors.green,
-                  ),
+                        fontWeight: FontWeight.bold,
+                        color: _isContinuousMode ? Colors.blue : Colors.green,
+                      ),
                 ),
               ),
-              
+
               // Manual update button (only visible in manual mode)
               if (!_isContinuousMode)
                 Padding(
@@ -266,7 +268,7 @@ class _BasicDemoScreenState extends BaseDemoScreenState<BasicDemoScreen> {
                     ),
                   ),
                 ),
-                
+
               // Ticker with downward scrolling
               Card(
                 child: Padding(
@@ -322,7 +324,8 @@ class _BasicDemoScreenState extends BaseDemoScreenState<BasicDemoScreen> {
                             characterLists: [
                               '${TickerUtils.provideNumberList()}.'
                             ],
-                            preferredScrollingDirection: ScrollingDirection.down,
+                            preferredScrollingDirection:
+                                ScrollingDirection.down,
                           ),
                         ],
                       ),
@@ -372,7 +375,8 @@ class _BasicDemoScreenState extends BaseDemoScreenState<BasicDemoScreen> {
       _ticker1Key.currentState?.setText(getRandomNumber(digits));
 
       // Update the currency ticker
-      final currencyFloat = (BaseDemoScreenState.random.nextDouble() * 100).toString();
+      final currencyFloat =
+          (BaseDemoScreenState.random.nextDouble() * 100).toString();
       _ticker2Key.currentState?.setText(
           currencyFloat.substring(0, min(digits, currencyFloat.length)));
 
@@ -415,7 +419,9 @@ class _PerformanceDemoScreenState
           IconButton(
             icon: Icon(_isContinuousMode ? Icons.loop : Icons.touch_app),
             onPressed: toggleUpdateMode,
-            tooltip: _isContinuousMode ? 'Switch to Manual Mode' : 'Switch to Continuous Mode',
+            tooltip: _isContinuousMode
+                ? 'Switch to Manual Mode'
+                : 'Switch to Continuous Mode',
           ),
           // Add manual update button when in manual mode
           if (!_isContinuousMode)
@@ -434,9 +440,9 @@ class _PerformanceDemoScreenState
             child: Text(
               'Mode: ${_isContinuousMode ? 'Continuous (Auto)' : 'Manual (Tap to Update)'}',
               style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                fontWeight: FontWeight.bold,
-                color: _isContinuousMode ? Colors.blue : Colors.green,
-              ),
+                    fontWeight: FontWeight.bold,
+                    color: _isContinuousMode ? Colors.blue : Colors.green,
+                  ),
             ),
           ),
           // List of tickers
@@ -445,7 +451,8 @@ class _PerformanceDemoScreenState
               itemCount: _tickerKeys.length,
               itemBuilder: (context, index) {
                 return Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 16.0),
+                  padding: const EdgeInsets.symmetric(
+                      vertical: 4.0, horizontal: 16.0),
                   child: Card(
                     child: Padding(
                       padding: const EdgeInsets.all(16.0),
@@ -618,7 +625,9 @@ class _StyledDemoScreenState extends BaseDemoScreenState<StyledDemoScreen> {
           IconButton(
             icon: Icon(_isContinuousMode ? Icons.loop : Icons.touch_app),
             onPressed: toggleUpdateMode,
-            tooltip: _isContinuousMode ? 'Switch to Manual Mode' : 'Switch to Continuous Mode',
+            tooltip: _isContinuousMode
+                ? 'Switch to Manual Mode'
+                : 'Switch to Continuous Mode',
           ),
         ],
       ),
@@ -633,12 +642,12 @@ class _StyledDemoScreenState extends BaseDemoScreenState<StyledDemoScreen> {
                 child: Text(
                   'Mode: ${_isContinuousMode ? "Continuous (Auto)" : "Manual (Tap to Update)"}',
                   style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: _isContinuousMode ? Colors.blue : Colors.green,
-                  ),
+                        fontWeight: FontWeight.bold,
+                        color: _isContinuousMode ? Colors.blue : Colors.green,
+                      ),
                 ),
               ),
-              
+
               // Manual update button (only visible in manual mode)
               if (!_isContinuousMode)
                 Padding(
@@ -653,7 +662,7 @@ class _StyledDemoScreenState extends BaseDemoScreenState<StyledDemoScreen> {
                     ),
                   ),
                 ),
-                
+
               // Standard Ticker (no custom styling)
               Card(
                 margin: const EdgeInsets.all(16.0),
@@ -671,9 +680,7 @@ class _StyledDemoScreenState extends BaseDemoScreenState<StyledDemoScreen> {
                         text: '1234.56',
                         textSize: 30,
                         textColor: Colors.black,
-                        characterLists: [
-                          '${TickerUtils.provideNumberList()}.'
-                        ],
+                        characterLists: ['${TickerUtils.provideNumberList()}.'],
                         preferredScrollingDirection: ScrollingDirection.up,
                       ),
                     ],
@@ -702,9 +709,7 @@ class _StyledDemoScreenState extends BaseDemoScreenState<StyledDemoScreen> {
                           fontWeight: FontWeight.bold,
                           color: Colors.black,
                         ),
-                        characterLists: [
-                          '${TickerUtils.provideNumberList()}.'
-                        ],
+                        characterLists: ['${TickerUtils.provideNumberList()}.'],
                         preferredScrollingDirection: ScrollingDirection.up,
                       ),
                     ],
@@ -737,9 +742,7 @@ class _StyledDemoScreenState extends BaseDemoScreenState<StyledDemoScreen> {
                         decimalDigitsStyle: const TextStyle(
                           color: Colors.green,
                         ),
-                        characterLists: [
-                          '${TickerUtils.provideNumberList()}.'
-                        ],
+                        characterLists: ['${TickerUtils.provideNumberList()}.'],
                         preferredScrollingDirection: ScrollingDirection.up,
                       ),
                     ],
@@ -777,9 +780,7 @@ class _StyledDemoScreenState extends BaseDemoScreenState<StyledDemoScreen> {
                           color: Colors.teal,
                           fontStyle: FontStyle.italic,
                         ),
-                        characterLists: [
-                          '${TickerUtils.provideNumberList()}.'
-                        ],
+                        characterLists: ['${TickerUtils.provideNumberList()}.'],
                         preferredScrollingDirection: ScrollingDirection.up,
                       ),
                     ],
@@ -828,7 +829,8 @@ class _StyledDemoScreenState extends BaseDemoScreenState<StyledDemoScreen> {
                             characterLists: [
                               '${TickerUtils.provideNumberList()}.'
                             ],
-                            preferredScrollingDirection: ScrollingDirection.down,
+                            preferredScrollingDirection:
+                                ScrollingDirection.down,
                           ),
                         ],
                       ),
@@ -848,9 +850,10 @@ class _StyledDemoScreenState extends BaseDemoScreenState<StyledDemoScreen> {
     setState(() {
       // Generate random price with 2 decimal places
       final intPart = BaseDemoScreenState.random.nextInt(10000);
-      final decimalPart = BaseDemoScreenState.random.nextInt(100).toString().padLeft(2, '0');
+      final decimalPart =
+          BaseDemoScreenState.random.nextInt(100).toString().padLeft(2, '0');
       final newValue = '$intPart.$decimalPart';
-      
+
       // Update all tickers with the same value
       _standardTickerKey.currentState?.setText(newValue);
       _boldWholeNumbersTickerKey.currentState?.setText(newValue);

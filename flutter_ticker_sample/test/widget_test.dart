@@ -13,7 +13,8 @@ import 'package:flutter_ticker_sample/main.dart';
 import 'package:flutter_ticker_sample/interactive_demo.dart';
 
 void main() {
-  testWidgets('Navigation to Interactive Demo works', (WidgetTester tester) async {
+  testWidgets('Navigation to Interactive Demo works',
+      (WidgetTester tester) async {
     // Build our app and trigger a frame.
     await tester.pumpWidget(const MyApp());
 
@@ -26,15 +27,15 @@ void main() {
 
     // Verify that we're on the Interactive Demo screen
     expect(find.byType(InteractiveDemoScreen), findsOneWidget);
-    
+
     // Verify that we have a TickerWidget for the counter
     expect(find.byType(TickerWidget), findsWidgets);
-    
+
     // Find the floating action button and tap it
     expect(find.byType(FloatingActionButton), findsOneWidget);
     await tester.tap(find.byType(FloatingActionButton));
     await tester.pumpAndSettle();
-    
+
     // We can't directly check the text value since it's in a custom widget,
     // but we can verify the FloatingActionButton still exists after tapping
     expect(find.byType(FloatingActionButton), findsOneWidget);

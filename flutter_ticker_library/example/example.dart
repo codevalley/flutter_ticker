@@ -47,7 +47,7 @@ class _MyHomePageState extends State<MyHomePage> {
       // Update price ticker (normal)
       final price = (_counter * 1.25).toStringAsFixed(2);
       _priceTickerKey.currentState?.setText(price);
-      
+
       // Update styled price ticker
       _styledPriceTickerKey.currentState?.setText(price);
 
@@ -134,7 +134,8 @@ class _MyHomePageState extends State<MyHomePage> {
                           key: _priceTickerKey,
                           initialValue: '0.00',
                           text: '0.00',
-                          animateOnLoad: false, // No initial animation for this one
+                          animateOnLoad:
+                              false, // No initial animation for this one
                           textSize: 30,
                           textColor: Colors.green,
                           characterLists: [
@@ -148,7 +149,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
               ),
             ),
-            
+
             // Price ticker (styled)
             Card(
               margin: const EdgeInsets.all(16),
@@ -219,7 +220,8 @@ class _MyHomePageState extends State<MyHomePage> {
                       key: _textTickerKey,
                       initialValue: 'LOADING',
                       text: 'FLUTTER',
-                      animateOnLoad: true, // Animate from LOADING to FLUTTER on first render
+                      animateOnLoad:
+                          true, // Animate from LOADING to FLUTTER on first render
                       textSize: 30,
                       textColor: Colors.orange,
                       characterLists: [TickerUtils.provideAlphabeticalList()],

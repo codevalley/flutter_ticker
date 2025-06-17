@@ -19,7 +19,8 @@ void main() {
     test('constructor initializes correctly', () {
       final characterList = TickerCharacterList('0123456789');
       expect(characterList.numOriginalCharacters, 10);
-      expect(characterList.characterList.length, 21); // EMPTY_CHAR + list + list
+      expect(
+          characterList.characterList.length, 21); // EMPTY_CHAR + list + list
     });
 
     test('getSupportedCharacters returns correct set', () {
@@ -28,24 +29,25 @@ void main() {
       expect(supported, {'a', 'b', 'c'});
     });
 
-    test('getCharacterIndices returns correct indices for upward scrolling', () {
+    test('getCharacterIndices returns correct indices for upward scrolling',
+        () {
       final characterList = TickerCharacterList('0123456789');
-      final indices = characterList.getCharacterIndices(
-        '3', '1', ScrollingDirection.up
-      );
+      final indices =
+          characterList.getCharacterIndices('3', '1', ScrollingDirection.up);
       expect(indices?.startIndex, greaterThan(indices?.endIndex ?? 0));
     });
 
-    test('getCharacterIndices returns correct indices for downward scrolling', () {
+    test('getCharacterIndices returns correct indices for downward scrolling',
+        () {
       final characterList = TickerCharacterList('0123456789');
-      final indices = characterList.getCharacterIndices(
-        '1', '3', ScrollingDirection.down
-      );
+      final indices =
+          characterList.getCharacterIndices('1', '3', ScrollingDirection.down);
       expect(indices?.startIndex, lessThan(indices?.endIndex ?? 0));
     });
   });
 
-  testWidgets('TickerWidget initializes with correct text', (WidgetTester tester) async {
+  testWidgets('TickerWidget initializes with correct text',
+      (WidgetTester tester) async {
     // Build our widget and trigger a frame
     await tester.pumpWidget(
       MaterialApp(

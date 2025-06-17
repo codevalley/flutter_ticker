@@ -28,7 +28,7 @@ class TickerColumn {
 
   /// The ending index in the character list
   int _endIndex = 0;
-  
+
   /// The position index of this column in the text (for styling)
   int _positionIndex = -1;
 
@@ -55,7 +55,7 @@ class TickerColumn {
   void setCharacterLists(List<TickerCharacterList> characterLists) {
     _characterLists = characterLists;
   }
-  
+
   /// Sets the position index of this column in the text (for styling)
   void setPositionIndex(int index) {
     _positionIndex = index;
@@ -154,7 +154,8 @@ class TickerColumn {
 
   /// Checks if the draw metrics have changed and updates widths accordingly
   void _checkForDrawMetricsChanges() {
-    final double currentTargetWidth = _metrics.getCharWidth(_targetChar, _positionIndex);
+    final double currentTargetWidth =
+        _metrics.getCharWidth(_targetChar, _positionIndex);
     // Only resize due to DrawMetrics changes when we are done with whatever animation we
     // are running.
     if (_currentWidth == _targetWidth && _targetWidth != currentTargetWidth) {
@@ -276,9 +277,10 @@ class TickerColumn {
 
       // Get the character to draw
       final String character = characterList[index];
-      
+
       // Get the appropriate text style based on position
-      final TextStyle style = _metrics.getTextStyleForPosition(_positionIndex, character);
+      final TextStyle style =
+          _metrics.getTextStyleForPosition(_positionIndex, character);
 
       // Update the text painter with the character to draw and appropriate style
       textPainter.text = TextSpan(

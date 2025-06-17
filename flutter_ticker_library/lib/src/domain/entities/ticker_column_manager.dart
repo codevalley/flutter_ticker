@@ -23,7 +23,7 @@ class TickerColumnManager {
 
   /// The set of characters supported by the character lists
   Set<String>? _supportedCharacters;
-  
+
   /// Index of the decimal point in the text (for styling)
   int _decimalPointIndex = -1;
 
@@ -56,17 +56,17 @@ class TickerColumnManager {
   List<TickerCharacterList>? getCharacterLists() {
     return _characterLists;
   }
-  
+
   /// Gets the current decimal point index
   int getDecimalPointIndex() {
     return _decimalPointIndex;
   }
-  
+
   /// Sets the decimal point index in the text (for styling)
   void setDecimalPointIndex(int index) {
     _decimalPointIndex = index;
     _metrics.setDecimalPointIndex(index);
-    
+
     // Update position index for each column
     for (int i = 0; i < tickerColumns.length; i++) {
       tickerColumns[i].setPositionIndex(i);
@@ -93,21 +93,22 @@ class TickerColumnManager {
 
     // Use improved two-phase animation approach for smoother transitions
     _setTextWithTwoPhaseAnimation(currentTextChars, newTextChars);
-    
+
     // Update position index for each column after text changes
     for (int i = 0; i < tickerColumns.length; i++) {
       tickerColumns[i].setPositionIndex(i);
     }
-    
+
     // Mark that we've completed the first animation
     _isFirstAnimation = false;
   }
 
   /// Implements a two-phase animation approach for smoother character count transitions
-  void _setTextWithTwoPhaseAnimation(List<String> currentChars, List<String> newChars) {
+  void _setTextWithTwoPhaseAnimation(
+      List<String> currentChars, List<String> newChars) {
     final int currentLength = currentChars.length;
     final int newLength = newChars.length;
-    
+
     if (currentLength == newLength) {
       // Same length - use direct character-to-character animation
       _animateDirectCharacterChanges(currentChars, newChars);
@@ -121,7 +122,8 @@ class TickerColumnManager {
   }
 
   /// Handles direct character-to-character animation when lengths are the same
-  void _animateDirectCharacterChanges(List<String> currentChars, List<String> newChars) {
+  void _animateDirectCharacterChanges(
+      List<String> currentChars, List<String> newChars) {
     // Ensure we have the right number of columns
     while (tickerColumns.length < newChars.length) {
       tickerColumns.add(TickerColumn(_characterLists!, _metrics));
@@ -141,14 +143,14 @@ class TickerColumnManager {
     final int currentLength = currentChars.length;
     final int newLength = newChars.length;
     final int additionalChars = newLength - currentLength;
-    
+
     // Strategy: Add characters at the beginning to maintain visual balance
     // For numbers: 999 -> 0999 -> 1000
     // For words: DOG -> ADOGA -> TIGER (balanced addition)
-    
+
     // First, create the intermediate state by adding characters
     final List<String> intermediateChars = <String>[];
-    
+
     if (_isNumericText(newChars)) {
       // For numeric text, add at the beginning
       for (int i = 0; i < additionalChars; i++) {
@@ -159,19 +161,20 @@ class TickerColumnManager {
       // For text, balance the addition (add some at start, some at end)
       final int startAdditions = additionalChars ~/ 2;
       final int endAdditions = additionalChars - startAdditions;
-      
+
       // Add characters at the start
       for (int i = 0; i < startAdditions; i++) {
         intermediateChars.add(_getStartingCharForPosition(i, newChars[i]));
       }
-      
+
       // Add existing characters
       intermediateChars.addAll(currentChars);
-      
+
       // Add characters at the end
       for (int i = 0; i < endAdditions; i++) {
         final int targetIndex = newLength - endAdditions + i;
-        intermediateChars.add(_getStartingCharForPosition(targetIndex, newChars[targetIndex]));
+        intermediateChars.add(
+            _getStartingCharForPosition(targetIndex, newChars[targetIndex]));
       }
     }
 
@@ -201,15 +204,15 @@ class TickerColumnManager {
   void _animateShrinkingText(List<String> currentChars, List<String> newChars) {
     final int currentLength = currentChars.length;
     final int newLength = newChars.length;
-    
+
     // Strategy: Animate characters to empty first, then remove columns
     // This creates a smooth shrinking effect
-    
+
     // Phase 1: Set target characters for remaining positions
     for (int i = 0; i < newLength; i++) {
       _setTargetCharWithStartConfig(tickerColumns[i], newChars[i]);
     }
-    
+
     // Phase 2: Set excess characters to empty (they will animate out)
     for (int i = newLength; i < currentLength; i++) {
       tickerColumns[i].setTargetChar(TickerUtils.emptyChar);
@@ -219,7 +222,7 @@ class TickerColumnManager {
   /// Determines if the text appears to be numeric
   bool _isNumericText(List<String> chars) {
     if (chars.isEmpty) return false;
-    
+
     // Check if all characters are digits or common numeric symbols
     for (final char in chars) {
       if (!RegExp(r'[0-9.,]').hasMatch(char)) {
@@ -236,18 +239,19 @@ class TickerColumnManager {
     }
 
     // Use provided config or default to first character for backward compatibility
-    final config = _animationStartConfig ?? const TickerAnimationStartConfig.first();
-    
+    final config =
+        _animationStartConfig ?? const TickerAnimationStartConfig.first();
+
     // Find the appropriate character list for this target character
     for (final characterList in _characterLists!) {
       if (characterList.getSupportedCharacters().contains(targetChar)) {
         return config.getStartingCharacter(
-          characterList.characterList.sublist(1, characterList.numOriginalCharacters + 1),
-          targetChar
-        );
+            characterList.characterList
+                .sublist(1, characterList.numOriginalCharacters + 1),
+            targetChar);
       }
     }
-    
+
     // Fallback to target character if no suitable list found
     return targetChar;
   }
@@ -257,26 +261,27 @@ class TickerColumnManager {
     // Apply start configuration on the very first animation
     // Default behavior is to start from first character (backward compatibility)
     final bool shouldApplyConfig = _isFirstAnimation;
-    
+
     if (shouldApplyConfig && _characterLists != null) {
       // Use provided config or default to first character for backward compatibility
-      final config = _animationStartConfig ?? const TickerAnimationStartConfig.first();
+      final config =
+          _animationStartConfig ?? const TickerAnimationStartConfig.first();
       // Find the appropriate character list for this target character
-              for (final characterList in _characterLists!) {
-          if (characterList.getSupportedCharacters().contains(targetChar)) {
-            // Get the starting character from the configuration
-            final String startChar = config.getStartingCharacter(
-              characterList.characterList.sublist(1, characterList.numOriginalCharacters + 1),
-              targetChar
-            );
-          
+      for (final characterList in _characterLists!) {
+        if (characterList.getSupportedCharacters().contains(targetChar)) {
+          // Get the starting character from the configuration
+          final String startChar = config.getStartingCharacter(
+              characterList.characterList
+                  .sublist(1, characterList.numOriginalCharacters + 1),
+              targetChar);
+
           // Set the current character to the start character first
           column.setCurrentChar(startChar);
           break;
         }
       }
     }
-    
+
     // Set the target character
     column.setTargetChar(targetChar);
   }
@@ -335,4 +340,3 @@ class TickerColumnManager {
     }
   }
 }
-

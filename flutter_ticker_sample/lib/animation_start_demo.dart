@@ -6,7 +6,8 @@ class AnimationStartDemoScreen extends StatefulWidget {
   const AnimationStartDemoScreen({super.key});
 
   @override
-  State<AnimationStartDemoScreen> createState() => _AnimationStartDemoScreenState();
+  State<AnimationStartDemoScreen> createState() =>
+      _AnimationStartDemoScreenState();
 }
 
 class _AnimationStartDemoScreenState extends State<AnimationStartDemoScreen> {
@@ -33,7 +34,7 @@ class _AnimationStartDemoScreenState extends State<AnimationStartDemoScreen> {
 
   void _updateAllTickers() {
     final newValue = _counter.toString();
-    
+
     _defaultTickerKey.currentState?.setText(newValue);
     _currentTickerKey.currentState?.setText(newValue);
     _lastTickerKey.currentState?.setText(newValue);
@@ -112,7 +113,8 @@ class _AnimationStartDemoScreenState extends State<AnimationStartDemoScreen> {
                   characterLists: [TickerUtils.provideNumberList()],
                   animationDuration: 1200,
                   gravity: Alignment.center,
-                  animationStartConfig: const TickerAnimationStartConfig.current(),
+                  animationStartConfig:
+                      const TickerAnimationStartConfig.current(),
                 ),
               ),
 
@@ -162,7 +164,8 @@ class _AnimationStartDemoScreenState extends State<AnimationStartDemoScreen> {
                   characterLists: [TickerUtils.provideNumberList()],
                   animationDuration: 1200,
                   gravity: Alignment.center,
-                  animationStartConfig: const TickerAnimationStartConfig.specific('5'),
+                  animationStartConfig:
+                      const TickerAnimationStartConfig.specific('5'),
                 ),
               ),
 
@@ -246,4 +249,4 @@ class _AnimationStartDemoScreenState extends State<AnimationStartDemoScreen> {
       ),
     );
   }
-} 
+}
