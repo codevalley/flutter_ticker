@@ -179,6 +179,29 @@ TickerWidget(
 
 **Important**: This configuration only applies to the initial/first animation. All subsequent animations maintain natural fluidity by starting from the current character position.
 
+### Smooth Character Count Transitions
+
+The ticker automatically handles character count changes with improved animations:
+
+```dart
+// When animating from "999" to "1000":
+// Old behavior: 999 → 000 → 1000 (jarring layout shift)
+// New behavior: 999 → 0999 → 1000 (smooth transition)
+
+TickerWidget(
+  text: "1000", // Will smoothly transition from previous value
+  characterLists: [TickerUtils.provideNumberList()],
+)
+```
+
+#### How Character Count Changes Work
+
+- **Growing (999 → 1000)**: New characters are added with appropriate starting positions, then all characters animate to final values
+- **Shrinking (1000 → 999)**: Excess characters animate to empty and are removed gracefully  
+- **Numbers**: Additional characters are added at the beginning (leading zeros)
+- **Text**: Characters are balanced between start and end for natural flow
+- **No layout shifts**: Final layout is established immediately to prevent jarring transitions
+
 ## API Reference
 
 ### TickerWidget

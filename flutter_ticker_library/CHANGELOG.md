@@ -1,3 +1,37 @@
+## 0.3.1
+
+* **MAJOR IMPROVEMENT**: Added configurable animation starting positions
+  * New `animationStartConfig` parameter allows control over initial animation behavior
+  * `TickerAnimationStartConfig.first()` - Start from first character (e.g., '0' for numbers) - **DEFAULT**
+  * `TickerAnimationStartConfig.current()` - No initial animation, show value immediately
+  * `TickerAnimationStartConfig.last()` - Start from last character (e.g., '9' for numbers)
+  * `TickerAnimationStartConfig.random()` - Start from random character each time
+  * `TickerAnimationStartConfig.specific(char)` - Start from specific character
+  * Configuration only applies to initial animation, preserving fluidity for subsequent changes
+  * **BACKWARD COMPATIBLE**: Default behavior maintains existing production behavior
+
+* **CRITICAL FIX**: Completely redesigned character count change animations
+  * **Problem solved**: Eliminated jarring layout shifts when character count changes (e.g., 999 → 1000)
+  * **Old behavior**: 999 → 000 → 1000 (confusing intermediate state + sudden layout shift)
+  * **New behavior**: 999 → 0999 → 1000 (smooth transition with no layout shifts)
+  * Smart character addition strategy:
+    * Numbers: Add leading characters at the beginning for natural counting effect
+    * Text: Balanced character addition between start and end (e.g., DOG → ADOGA → TIGER)
+  * Graceful shrinking: Characters animate to empty before removal
+  * Respects animation start configuration for new characters
+  * Two-phase animation approach ensures final layout is established immediately
+
+* **ENHANCED DEMOS**: Added comprehensive demonstration screens
+  * New `AnimationStartDemoScreen` showcases all starting position configurations
+  * New `CharacterCountDemoScreen` demonstrates improved character count transitions
+  * Interactive controls for testing different scenarios
+  * Real-time comparison of behaviors
+
+* **IMPROVED ARCHITECTURE**: Replaced Levenshtein algorithm with intelligent transition system
+  * Better visual results with smoother animations
+  * Reduced complexity while improving user experience
+  * More predictable and controllable animation behavior
+
 ## 0.3.0
 
 * Added support for different text styles for different parts of numeric values:

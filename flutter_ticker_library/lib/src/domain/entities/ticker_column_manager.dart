@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../../../src/core/utils/levenshtein_utils.dart';
 import '../../../src/core/utils/ticker_utils.dart';
 import 'ticker_animation_start_config.dart';
 import 'ticker_character_list.dart';
@@ -92,37 +91,8 @@ class TickerColumnManager {
     final List<String> currentTextChars = getCurrentText().split('');
     final List<String> newTextChars = text.split('');
 
-    // Use Levenshtein distance algorithm to figure out how to manipulate the columns
-    final List<int> actions = LevenshteinUtils.computeColumnActions(
-        currentTextChars, newTextChars, _supportedCharacters!);
-
-    int columnIndex = 0;
-    int textIndex = 0;
-
-    for (int i = 0; i < actions.length; i++) {
-      switch (actions[i]) {
-        case LevenshteinUtils.actionInsert:
-          tickerColumns.insert(
-              columnIndex, TickerColumn(_characterLists!, _metrics));
-          // Intentional fallthrough
-          continue actionSame;
-
-        actionSame:
-        case LevenshteinUtils.actionSame:
-          _setTargetCharWithStartConfig(tickerColumns[columnIndex], newTextChars[textIndex]);
-          columnIndex++;
-          textIndex++;
-          break;
-
-        case LevenshteinUtils.actionDelete:
-          tickerColumns[columnIndex].setTargetChar(TickerUtils.emptyChar);
-          columnIndex++;
-          break;
-
-        default:
-          throw ArgumentError('Unknown action: ${actions[i]}');
-      }
-    }
+    // Use improved two-phase animation approach for smoother transitions
+    _setTextWithTwoPhaseAnimation(currentTextChars, newTextChars);
     
     // Update position index for each column after text changes
     for (int i = 0; i < tickerColumns.length; i++) {
@@ -131,6 +101,155 @@ class TickerColumnManager {
     
     // Mark that we've completed the first animation
     _isFirstAnimation = false;
+  }
+
+  /// Implements a two-phase animation approach for smoother character count transitions
+  void _setTextWithTwoPhaseAnimation(List<String> currentChars, List<String> newChars) {
+    final int currentLength = currentChars.length;
+    final int newLength = newChars.length;
+    
+    if (currentLength == newLength) {
+      // Same length - use direct character-to-character animation
+      _animateDirectCharacterChanges(currentChars, newChars);
+    } else if (newLength > currentLength) {
+      // Growing - add characters with smart positioning
+      _animateGrowingText(currentChars, newChars);
+    } else {
+      // Shrinking - remove characters gracefully
+      _animateShrinkingText(currentChars, newChars);
+    }
+  }
+
+  /// Handles direct character-to-character animation when lengths are the same
+  void _animateDirectCharacterChanges(List<String> currentChars, List<String> newChars) {
+    // Ensure we have the right number of columns
+    while (tickerColumns.length < newChars.length) {
+      tickerColumns.add(TickerColumn(_characterLists!, _metrics));
+    }
+    while (tickerColumns.length > newChars.length) {
+      tickerColumns.removeLast();
+    }
+
+    // Set target characters for each column
+    for (int i = 0; i < newChars.length; i++) {
+      _setTargetCharWithStartConfig(tickerColumns[i], newChars[i]);
+    }
+  }
+
+  /// Handles growing text with smart character insertion
+  void _animateGrowingText(List<String> currentChars, List<String> newChars) {
+    final int currentLength = currentChars.length;
+    final int newLength = newChars.length;
+    final int additionalChars = newLength - currentLength;
+    
+    // Strategy: Add characters at the beginning to maintain visual balance
+    // For numbers: 999 -> 0999 -> 1000
+    // For words: DOG -> ADOGA -> TIGER (balanced addition)
+    
+    // First, create the intermediate state by adding characters
+    final List<String> intermediateChars = <String>[];
+    
+    if (_isNumericText(newChars)) {
+      // For numeric text, add at the beginning
+      for (int i = 0; i < additionalChars; i++) {
+        intermediateChars.add(_getStartingCharForPosition(0, newChars[0]));
+      }
+      intermediateChars.addAll(currentChars);
+    } else {
+      // For text, balance the addition (add some at start, some at end)
+      final int startAdditions = additionalChars ~/ 2;
+      final int endAdditions = additionalChars - startAdditions;
+      
+      // Add characters at the start
+      for (int i = 0; i < startAdditions; i++) {
+        intermediateChars.add(_getStartingCharForPosition(i, newChars[i]));
+      }
+      
+      // Add existing characters
+      intermediateChars.addAll(currentChars);
+      
+      // Add characters at the end
+      for (int i = 0; i < endAdditions; i++) {
+        final int targetIndex = newLength - endAdditions + i;
+        intermediateChars.add(_getStartingCharForPosition(targetIndex, newChars[targetIndex]));
+      }
+    }
+
+    // Ensure we have the right number of columns for the intermediate state
+    while (tickerColumns.length < intermediateChars.length) {
+      tickerColumns.add(TickerColumn(_characterLists!, _metrics));
+    }
+
+    // Phase 1: Set intermediate characters (this establishes the final layout)
+    for (int i = 0; i < intermediateChars.length; i++) {
+      if (i < currentLength) {
+        // Existing columns keep their current character
+        continue;
+      } else {
+        // New columns get the starting character
+        tickerColumns[i].setCurrentChar(intermediateChars[i]);
+      }
+    }
+
+    // Phase 2: Animate to final characters
+    for (int i = 0; i < newChars.length; i++) {
+      tickerColumns[i].setTargetChar(newChars[i]);
+    }
+  }
+
+  /// Handles shrinking text with graceful character removal
+  void _animateShrinkingText(List<String> currentChars, List<String> newChars) {
+    final int currentLength = currentChars.length;
+    final int newLength = newChars.length;
+    
+    // Strategy: Animate characters to empty first, then remove columns
+    // This creates a smooth shrinking effect
+    
+    // Phase 1: Set target characters for remaining positions
+    for (int i = 0; i < newLength; i++) {
+      _setTargetCharWithStartConfig(tickerColumns[i], newChars[i]);
+    }
+    
+    // Phase 2: Set excess characters to empty (they will animate out)
+    for (int i = newLength; i < currentLength; i++) {
+      tickerColumns[i].setTargetChar(TickerUtils.emptyChar);
+    }
+  }
+
+  /// Determines if the text appears to be numeric
+  bool _isNumericText(List<String> chars) {
+    if (chars.isEmpty) return false;
+    
+    // Check if all characters are digits or common numeric symbols
+    for (final char in chars) {
+      if (!RegExp(r'[0-9.,]').hasMatch(char)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  /// Gets the appropriate starting character for a position based on configuration
+  String _getStartingCharForPosition(int position, String targetChar) {
+    if (!_isFirstAnimation || _characterLists == null) {
+      return targetChar;
+    }
+
+    // Use provided config or default to first character for backward compatibility
+    final config = _animationStartConfig ?? const TickerAnimationStartConfig.first();
+    
+    // Find the appropriate character list for this target character
+    for (final characterList in _characterLists!) {
+      if (characterList.getSupportedCharacters().contains(targetChar)) {
+        return config.getStartingCharacter(
+          characterList.characterList.sublist(1, characterList.numOriginalCharacters + 1),
+          targetChar
+        );
+      }
+    }
+    
+    // Fallback to target character if no suitable list found
+    return targetChar;
   }
 
   /// Helper method to set target character with animation start configuration
@@ -216,3 +335,4 @@ class TickerColumnManager {
     }
   }
 }
+
